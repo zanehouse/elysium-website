@@ -6,8 +6,13 @@
   <title>Elysium — Under Construction</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
+/*
+if youre reading this yes i know its thrown together and its bad and i dont care lol
+*/
+
     /* =========================================
    ELYSIUM CAPITAL — STYLE.CSS
    ========================================= */
@@ -661,6 +666,39 @@ footer {
 
   </style>
 </head>
+
+<style>
+  @keyframes fadeZoom {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes fadeZoom2 {
+  0% {
+    opacity: 0;
+    transform: translate(0, 12px);
+  }
+  40% {
+    opacity: 0;
+    transform: translate(0, 12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+main{
+  animation: fadeZoom .75s ease-in-out;
+}
+.footer-inner {
+  animation: fadeZoom2 1.25s ease-in-out;
+}
+</style>
 <body>
 
   <main style="display:grid; place-content: center; height: 90%;width:100%; min-height: 90vh;">
@@ -695,7 +733,7 @@ footer {
     </div>
 
   </main>
-  <div class="footer-inner"><span class="footer-copy"><img src="/assets/logo.png" style="width: 10vh; opacity: .25;"><br>© 2026 ELYSIUM — Independent Macro Research. All rights reserved.</span></div>
+  <div class="footer-inner"><span class="footer-copy"><img src="assets/logo.png" style="width: 10vh; opacity: .25;"><br>© 2026 ELYSIUM — Independent Macro Research. All rights reserved.</span></div>
   <script src="/js/script.js"></script>
 </body>
 </html>
