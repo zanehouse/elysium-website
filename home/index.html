@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Private Capital &amp; Macro Strategies &ndash; Elysium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+
+  <script>
+    document.documentElement.classList.add('js');</script>
+</head>
+
+<body>
+<!-- Fallback for users with JS disabled: make reveal elements visible immediately -->
+    <noscript>
+      <style>
+        .reveal {
+          opacity: 1 !important;
+          transform: none !important;
+          transition: none !important;
+        }
+      </style>
+    </noscript>
+
+  <header>
+    <div class="nav-inner">
+      <!-- <span class="nav-logo">Elysium Capital</span> -->
+      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium Capital"></a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="/home/" class="active">Home</a>
+        <a href="/research/">Research</a>
+        <a href="/framework/">Framework</a>
+        <a href="/links/">Links</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="hero reveal">
+      <p class="hero-eyebrow">Independent Macro Research</p>
+      <h1 class="hero-headline unselectable">
+        <span class="word-rotator">
+          <span class="word current">Clarity</span>
+          <span class="word next"></span>
+        </span>
+        at the intersection of macro and capital allocation.
+      </h1>
+
+      <noscript>
+        <style>
+          .word.next {
+            display: none;
+          }
+        </style>
+      </noscript>
+      <p class="hero-sub">
+        Elysium Capital provides institutional-grade macro research and regime-aware
+        allocation frameworks for disciplined, long-horizon investors.
+      </p>
+    </section>
+
+    <section class="reveal">
+      <div class="section-header">
+        <span class="section-title">Latest Research</span>
+        <a class="section-link" href="/research/">View Archive →</a>
+      </div>
+
+      <div class="cards">
+
+        <article class="card">
+          <p class="card-date">February 2025</p>
+          <h2 class="card-title">Regime Inflection: Why the Disinflation Trade May Be Exhausted</h2>
+          <p class="card-summary">
+            The structural bid for duration assets that defined the post-GFC era is
+            giving way to a more complex macro backdrop. We examine leading indicators
+            pointing toward a late-cycle regime transition.
+          </p>
+          <a class="card-cta" href="/research/post-1.html">Read Essay →</a>
+        </article>
+
+        <article class="card">
+          <p class="card-date">January 2025</p>
+          <h2 class="card-title">Credit Spreads as a Regime Signal: A Historical Audit</h2>
+          <p class="card-summary">
+            Spread compression has historically preceded macro turning points by
+            six to eighteen months. We audit three decades of data to construct
+            a forward-looking signal framework for risk allocation.
+          </p>
+          <a class="card-cta" href="/research/post-2.html">Read Essay →</a>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="reveal">
+      <div class="section-header">
+        <span class="section-title">What We Do</span>
+      </div>
+      <div class="cards" style="margin-bottom:5rem;">
+        <div class="card">
+          <p class="card-date">Research</p>
+          <p class="card-summary" style="margin-bottom:0;">
+            Long-form macro and cross-asset analysis grounded in historical analogy,
+            structural economics, and data-driven signal construction.
+          </p>
+        </div>
+        <div class="card">
+          <p class="card-date">Framework</p>
+          <p class="card-summary" style="margin-bottom:0;">
+            A proprietary macro regime model that segments the economic cycle into
+            discrete phases and maps each to historical asset-class behavior.
+          </p>
+        </div>
+        <div class="card">
+          <p class="card-date">Perspective</p>
+          <p class="card-summary" style="margin-bottom:0;">
+            Independent, unconflicted macro research.
+            No external mandates or distribution incentives. Long-horizon, regime-aware analysis.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-copy">© 2025 Elysium Capital. All rights reserved.</span>
+      <span class="footer-copy">Independent Macro Research</span>
+    </div>
+  </footer>
+
+  <script src="/js/script.js"></script>
+  <script>
+    const words = [
+      "Clarity",
+      "Precision",
+      "Insight",
+      "Signal"
+    ];
+
+    const current = document.querySelector(".word.current");
+    const next = document.querySelector(".word.next");
+    const rotator = document.querySelector(".word-rotator");
+
+    let index = 0;
+
+    function resizeContainer(word) {
+      const temp = document.createElement("span");
+      temp.style.visibility = "hidden";
+      temp.style.position = "absolute";
+      temp.style.whiteSpace = "nowrap";
+      temp.textContent = word;
+      rotator.appendChild(temp);
+
+      const width = temp.offsetWidth;
+      rotator.style.width = width + "px";
+
+      temp.remove();
+    }
+
+    resizeContainer(words[0]);
+
+    setInterval(() => {
+
+      index = (index + 1) % words.length;
+
+      const nextWord = words[index];
+
+      next.textContent = nextWord;
+      resizeContainer(nextWord);
+
+      current.classList.add("exit");
+      next.classList.add("enter");
+
+      setTimeout(() => {
+
+        current.textContent = nextWord;
+
+        current.classList.remove("exit");
+        next.classList.remove("enter");
+
+        next.textContent = "";
+
+      }, 450);
+
+    }, 3500);
+  </script>
+  <script src="/js/load.js" defer></script>
+</body>
+
+</html>
