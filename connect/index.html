@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Links &ndash; Elysium</title>
+  <title>Connect – Elysium</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
@@ -12,39 +12,52 @@
 </head>
 <body>
 
+  <!-- Proper header (uncommented and clean) -->
   <header>
-    <div class="nav-inner" style="display:grid;place-content: center;">
-      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium Capital"></a>
+    <div class="nav-inner">
+      <a class="nav-logo" href="/home/">
+        <img class="nav-logo" src="/assets/logo.png" alt="Elysium">
+      </a>
     </div>
   </header>
 
   <main>
-    <!-- Fallback for users with JS disabled: make reveal elements visible immediately -->
-    <noscript>
-      <style>
-        .reveal {
-          opacity: 1 !important;
-          transform: none !important;
-          transition: none !important;
-        }
-      </style>
-    </noscript>
-
     <div class="page-hero">
-      <h1>you found me!</h1>
-      <p>this is a hidden page for networkees.</p>
+      <h1 style="margin-bottom: 0;">Zane House</h1>
+      <p style="font-size: large; margin: .075em 0 1.5em 0">Macro Research &amp; Fintech Solutions</p>
+      <div class="connect-actions">
+        <a href="tel:+1XXXXXXXXXX" class="connect-btn">
+          Call or Text<br>
+          <span class="detail">+1 XXX-XXX-XXXX</span>
+        </a>
 
+        <a href="mailto:zane@elysiumlab.markets" class="connect-btn">
+          Email<br>
+          <span class="detail">zane@elysiumlab.markets</span>
+        </a>
+
+        <a href="/assets/zane-house.vcf" class="connect-btn" download>
+          Save to Contacts<br>
+          <span class="detail">Download vCard</span>
+        </a>
+      </div>
+
+      <p class="connect-note">
+        Private page for those who received my card.<br>
+        Preferred contact is direct call/text — I usually reply same day.
+      </p>
+    </div>
   </main>
 
   <footer>
     <div class="footer-inner">
-      <span class="footer-copy">© <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysian Capital. All rights reserved.</span>
+      <span class="footer-copy">© <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium Capital. All rights reserved.</span>
       <span class="footer-copy">Independent Macro Research</span>
     </div>
   </footer>
 
   <script src="/js/script.js"></script>
-    <script src="/js/load.js" defer></script>
+  <script src="/js/load.js" defer></script>
 
 </body>
 </html>
