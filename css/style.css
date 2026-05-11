@@ -720,6 +720,89 @@ footer {
 
 
 /* =========================================
+   RESEARCH LIST — SORT BAR
+   ========================================= */
+
+.sort-bar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2.5rem 0 1.5rem;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.sort-label {
+  font-size: .62rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sort-count {
+  font-size: .62rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+.sort-btn {
+  font-family: var(--font-sans);
+  font-size: .62rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  padding: 0 0 1px;
+  transition: color .2s, border-color .2s;
+}
+.sort-btn:hover         { color: var(--text); }
+.sort-btn.active        { color: var(--text); border-bottom-color: var(--border); }
+
+/* ── Research item enhancements ── */
+
+.research-item-ticker {
+  font-size: .6rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: .35rem;
+  font-family: 'Courier New', monospace;
+}
+
+.research-item-subtitle {
+  font-size: .82rem;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.6;
+  margin-bottom: .5rem;
+}
+
+/* Rating badge inside the date column */
+.research-item-rating {
+  display: block;
+  width: fit-content;
+  font-size: .55rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  margin-top: .7rem;
+}
+.research-item-rating.bullish { background: #166534; color: #4ade80; }
+.research-item-rating.neutral { background: #713f12; color: #facc15; }
+.research-item-rating.bearish { background: #7f1d1d; color: #f87171; }
+
+@media (max-width: 640px) {
+  .sort-bar  { gap: 1rem; padding: 1.5rem 0 1rem; }
+  .sort-count { margin-left: 0; width: 100%; }
+}
+
+/* =========================================
    CONNECT PAGE
    ========================================= */
 

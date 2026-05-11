@@ -28,92 +28,55 @@
   </header>
 
   <main>
-    <!-- Fallback for users with JS disabled: make reveal elements visible immediately -->
     <noscript>
-      <style>
-        .reveal {
-          opacity: 1 !important;
-          transform: none !important;
-          transition: none !important;
-        }
-      </style>
+      <style>.reveal{opacity:1!important;transform:none!important;transition:none!important}</style>
     </noscript>
 
     <div class="page-hero reveal">
       <h1>Research Archive</h1>
-      <p>Independent macro analysis exploring regime cycles, cross-asset dynamics, and structural market forces.</p>
+      <p>Independent macro and equity analysis — regime cycles, cross-asset dynamics, and fundamental research.</p>
+    </div>
+
+    <div class="sort-bar reveal">
+      <span class="sort-label">Sort by</span>
+      <button class="sort-btn active" data-sort="date-desc">Date ↓</button>
+      <button class="sort-btn"        data-sort="date-asc">Date ↑</button>
+      <button class="sort-btn"        data-sort="ticker">Ticker</button>
+      <button class="sort-btn"        data-sort="rating">Rating</button>
+      <span class="sort-count">1 report</span>
     </div>
 
     <ul class="research-list reveal">
-      <li class="research-item">
-        <span class="research-item-date">Feb 2025</span>
+      
+      <li class="research-item"
+          data-date="2026-05-09"
+          data-ticker="IREN"
+          data-rating="BULLISH">
+        <span class="research-item-date">
+          May 2026
+          <span class="research-item-rating bullish">▲ BULLISH</span>
+        </span>
         <div>
-          <h2 class="research-item-title">
-            <a href="/research/post-1.html">Regime Inflection: Why the Disinflation Trade May Be Exhausted</a>
-          </h2>
-          <p class="research-item-summary">
-            The structural bid for duration assets that defined the post-GFC era is giving way to a 
-            more complex macro backdrop. We examine leading indicators pointing toward a late-cycle 
-            regime transition and what it implies for risk-adjusted positioning.
-          </p>
+          <h2 class="research-item-title"><a href="/output/example.html">IREN Limited</a></h2>
+          <p class="research-item-ticker">IREN — NASDAQ</p>
+          <p class="research-item-subtitle">Bitcoin Mining & HPC Infrastructure — Initiating Coverage</p>
+          <p class="research-item-summary">IREN operates one of the lowest-cost Bitcoin mining platforms globally, with 52 EH/s of installed hash rate and a 100 EH/s target by end-2026. We initiate coverage with a Bullish rating and a $28.00 base price target, implying 89% upside.</p>
         </div>
-        <a class="research-item-cta" href="/research/post-1.html">Read →</a>
+        <a class="research-item-cta" href="/output/example.html">Read →</a>
       </li>
-
-      <li class="research-item">
-        <span class="research-item-date">Jan 2025</span>
-        <div>
-          <h2 class="research-item-title">
-            <a href="/research/post-2.html">Credit Spreads as a Regime Signal: A Historical Audit</a>
-          </h2>
-          <p class="research-item-summary">
-            Spread compression has historically preceded macro turning points by six to eighteen months. 
-            We audit three decades of data to construct a forward-looking signal framework for 
-            systematic risk allocation across economic regimes.
-          </p>
-        </div>
-        <a class="research-item-cta" href="/research/post-2.html">Read →</a>
-      </li>
-
-      <li class="research-item">
-        <span class="research-item-date">Dec 2024</span>
-        <div>
-          <h2 class="research-item-title">The Fiscal Dominance Hypothesis: Implications for Bond Markets</h2>
-          <p class="research-item-summary">
-            As sovereign debt levels approach historical extremes, the relationship between monetary 
-            policy and long rates may be fundamentally changing. We explore what fiscal dominance 
-            means for traditional fixed income portfolios. <em style="color:#555;">(Coming soon)</em>
-          </p>
-        </div>
-        <span class="research-item-cta" style="color:#444;">Upcoming</span>
-      </li>
-
-      <li class="research-item">
-        <span class="research-item-date">Nov 2024</span>
-        <div>
-          <h2 class="research-item-title">Commodities in a Multipolar World: Structural Demand Shifts</h2>
-          <p class="research-item-summary">
-            The de-dollarization narrative is often overstated, but the underlying commodity 
-            demand dynamics are real. A framework for thinking about structural commodity cycles 
-            in a fragmented geopolitical landscape. <em style="color:#555;">(Coming soon)</em>
-          </p>
-        </div>
-        <span class="research-item-cta" style="color:#444;">Upcoming</span>
-      </li>
-
     </ul>
 
   </main>
 
   <footer>
     <div class="footer-inner">
-      <span class="footer-copy">© <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium Capital. All rights reserved.</span>
+      <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium Capital. All rights reserved.</span>
       <span class="footer-copy">Independent Macro Research</span>
     </div>
   </footer>
 
   <script src="/js/script.js"></script>
-    <script src="/js/load.js" defer></script>
+  <script src="/js/load.js" defer></script>
 
 </body>
 </html>

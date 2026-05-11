@@ -36,3 +36,52 @@
     });
   });
 })();
+
+/* =========================================
+   RESEARCH LIST — client-side sort
+   ========================================= */
+(function () {
+  'use strict';
+
+  var sortBtns = document.querySelectorAll('.sort-btn');
+  if (!sortBtns.length) return;
+
+  var list         = document.querySelector('.research-list');
+  var ratingOrder  = { BULLISH: 0, NEUTRAL: 1, BEARISH: 2 };
+
+  function sortList(method) {
+    var items = Array.prototype.slice.call(list.querySelectorAll('.research-item'));
+
+    items.sort(function (a, b) {
+      var da, db, ra, rb;
+      switch (method) {
+        case 'date-desc':
+          da = a.dataset.date ? new Date(a.dataset.date) : new Date(0);
+          db = b.dataset.date ? new Date(b.dataset.date) : new Date(0);
+          return db - da;
+        case 'date-asc':
+          da = a.dataset.date ? new Date(a.dataset.date) : new Date(0);
+          db = b.dataset.date ? new Date(b.dataset.date) : new Date(0);
+          return da - db;
+        case 'ticker':
+          return (a.dataset.ticker || '').localeCompare(b.dataset.ticker || '');
+        case 'rating':
+          ra = ratingOrder[a.dataset.rating] !== undefined ? ratingOrder[a.dataset.rating] : 99;
+          rb = ratingOrder[b.dataset.rating] !== undefined ? ratingOrder[b.dataset.rating] : 99;
+          return ra - rb;
+        default:
+          return 0;
+      }
+    });
+
+    items.forEach(function (item) { list.appendChild(item); });
+  }
+
+  sortBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      sortBtns.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      sortList(btn.dataset.sort);
+    });
+  });
+})();
