@@ -85,3 +85,37 @@
     });
   });
 })();
+
+/* =========================================
+   RESEARCH LIST — client-side search filter
+   ========================================= */
+(function () {
+  'use strict';
+
+  var input = document.querySelector('.search-input');
+  var list  = document.querySelector('.research-list');
+  if (!input || !list) return;
+
+  var count = document.querySelector('.sort-count');
+  var items = Array.prototype.slice.call(list.querySelectorAll('.research-item'));
+  var total = items.length;
+
+  function label(n) {
+    return n + ' report' + (n !== 1 ? 's' : '');
+  }
+
+  input.addEventListener('input', function () {
+    var q = input.value.trim().toLowerCase();
+    var visible = 0;
+
+    items.forEach(function (item) {
+      var match = !q || item.textContent.toLowerCase().indexOf(q) !== -1;
+      item.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+
+    if (count) {
+      count.textContent = q ? visible + ' of ' + label(total) : label(total);
+    }
+  });
+})();

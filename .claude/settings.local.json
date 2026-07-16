@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm show *)",
+      "Bash(node build.js posts/example.md)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(python3 -c ' *)",
+      "Bash(node -e ' *)",
+      "Bash(node audit.js)",
+      "Bash(node build-index.js)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh pr create --base main --title 'Equity Research PDF pipeline + auto-generated research index' --body ' *)"
+    ]
+  }
+}

@@ -7,6 +7,7 @@ const { marked } = require('marked');
 const fetch      = require('node-fetch');
 const fs         = require('fs');
 const path       = require('path');
+const report     = require('./lib/report');
 
 // ─── Paths ────────────────────────────────────────────────────────────────────
 const ROOT       = path.resolve(__dirname);
@@ -117,55 +118,14 @@ function embedImages(html, mdDir) {
 
 // ─── HTML post-processing ─────────────────────────────────────────────────────
 
-// Blockquotes → .pull-quote (matching post-1.html's class)
-function processBlockquotes(html) {
-  return html.replace(/<blockquote>/g, '<blockquote class="pull-quote">');
-}
+const processBlockquotes = report.processBlockquotes;
 
 // ─── Header builders ──────────────────────────────────────────────────────────
-const BADGES = {
-  BULLISH: { bg: '#166534', color: '#4ade80', prefix: '▲' },
-  NEUTRAL: { bg: '#713f12', color: '#facc15', prefix: '—' },
-  BEARISH: { bg: '#7f1d1d', color: '#f87171', prefix: '▼' },
-};
-
 function ratingBadge(rating) {
-  const key = (rating || '').toUpperCase();
-  const b = BADGES[key] || BADGES.NEUTRAL;
-  return (
-    `<span class="rating-badge" style="background:${b.bg};color:${b.color}">` +
-    `${b.prefix} ${key}</span>`
-  );
+  return report.ratingLabel(rating, 'rating-badge');
 }
 
-function metaStrip(fm) {
-  const parts = [];
-  if (fm.price)      parts.push(fm.price);
-  if (fm.price_date) parts.push(fm.price_date);
-  if (fm.week52)     parts.push(`52-Wk Range: ${fm.week52}`);
-  if (fm.mkt_cap)    parts.push(`Mkt Cap: ${fm.mkt_cap}`);
-  if (fm.base_pt)    parts.push(`Base PT: ${fm.base_pt}`);
-  if (fm.horizon)    parts.push(`Horizon: ${fm.horizon}`);
-  return parts.join(' &nbsp;·&nbsp; ');
-}
-
-function keyFactsHTML(keyfacts) {
-  if (!Array.isArray(keyfacts) || !keyfacts.length) return '';
-  const rows = keyfacts
-    .map(
-      (kf, i) =>
-        `<tr class="${i % 2 === 1 ? 'alt' : ''}">` +
-        `<td class="kf-label">${kf.label}</td>` +
-        `<td class="kf-value">${kf.value}</td>` +
-        `</tr>`
-    )
-    .join('');
-  return (
-    `<div class="keyfacts-card">` +
-    `<table class="keyfacts-table"><tbody>${rows}</tbody></table>` +
-    `</div>`
-  );
-}
+const keyFactsHTML = report.keyFactsHTML;
 
 // ─── Puppeteer footer ─────────────────────────────────────────────────────────
 function footerTemplate(fm) {
@@ -221,17 +181,20 @@ async function build(mdFile) {
   bodyHTML = processBlockquotes(bodyHTML);
 
   // 4. Assemble template
+  // NOTE: replacement values are wrapped in functions so `$` sequences in the
+  // content (e.g. "$50.64", "$&") aren't treated as special replacement patterns.
   let html = fs.readFileSync(TPL_PATH, 'utf-8');
   html = html
-    .replace('{{FONT_CSS}}',      fontCSS)
-    .replace('{{LOGO_SRC}}',      logoSrc)
-    .replace('{{TITLE}}',         fm.title    || '')
-    .replace('{{SUBTITLE}}',      fm.subtitle || '')
-    .replace('{{RATING_BADGE}}',  fm.rating   ? ratingBadge(fm.rating) : '')
-    .replace('{{META_STRIP}}',    metaStrip(fm))
-    .replace('{{PUBLISH_DATE}}',  fm.date     || '')
-    .replace('{{KEYFACTS_HTML}}', keyFactsHTML(fm.keyfacts))
-    .replace('{{BODY_HTML}}',     bodyHTML);
+    .replace('{{FONT_CSS}}',      () => fontCSS)
+    .replace('{{LOGO_SRC}}',      () => logoSrc)
+    .replace('{{HEADER_LABEL}}',  () => report.headerLabel(fm))
+    .replace('{{TITLE}}',         () => fm.title    || '')
+    .replace('{{SUBTITLE}}',      () => fm.subtitle || '')
+    .replace('{{RATING_BADGE}}',  () => fm.rating   ? ratingBadge(fm.rating) : '')
+    .replace('{{META_STRIP_BLOCK}}', () => report.metaStripBlock(fm))
+    .replace('{{PUBLISH_DATE}}',  () => report.fmtDateLong(fm.date))
+    .replace('{{KEYFACTS_HTML}}', () => keyFactsHTML(fm.keyfacts))
+    .replace('{{BODY_HTML}}',     () => bodyHTML);
 
   // 5. Save debug HTML
   const htmlOut = path.join(OUTPUT_DIR, `${slug}.html`);

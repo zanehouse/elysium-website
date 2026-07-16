@@ -98,18 +98,22 @@ html, body {
   color: #999999;
 }
 
-/* Rating badge — the ONE colored element in the document */
+/* Rating label — the ONE colored element in the document, plain text (no pill) */
 .rating-badge {
   font-family: 'JetBrains Mono', 'Courier New', monospace;
   font-size: 12px;
   font-weight: 700;
-  padding: 6px 16px;
-  border-radius: 999px;
+  letter-spacing: 1px;
   white-space: nowrap;
   flex-shrink: 0;
   align-self: flex-start;
   margin-top: 4px;
 }
+
+/* Badge sits on the dark header — use bright variants for contrast */
+.rating-badge.bullish { color: #4ade80; }
+.rating-badge.neutral { color: #facc15; }
+.rating-badge.bearish { color: #f87171; }
 
 /* Row 3: meta strip */
 .header-meta {
@@ -385,7 +389,7 @@ main {
           <img src="{{LOGO_SRC}}" alt="Elysium" />
         </a>
       </div>
-      <div class="header-label">Equity Research</div>
+      <div class="header-label">{{HEADER_LABEL}}</div>
     </div>
 
     <div class="header-row2">
@@ -397,7 +401,7 @@ main {
     </div>
   </div>
 
-  <div class="header-meta">{{META_STRIP}}</div>
+  {{META_STRIP_BLOCK}}
   <div class="header-published">Published by Elysium &nbsp;·&nbsp; {{PUBLISH_DATE}}</div>
 
 </div>
