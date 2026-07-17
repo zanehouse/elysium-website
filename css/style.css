@@ -1262,6 +1262,8 @@ footer {
   color: #d1d1d1;
   letter-spacing: .2em;
   text-transform: uppercase;
+  /* mobile optimization */
+  padding-left: 1rem;
 }
 
 .header-row2 {
