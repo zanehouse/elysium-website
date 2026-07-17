@@ -59,6 +59,7 @@ function buildArchivePage(items) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Research Archive &ndash; Elysium</title>
+${report.metaTags({ title: 'Elysium Research Archive', description: 'Independent equity research and macro frameworks. Company coverage, sector screening, and market structure, kept clear and data-backed.', urlPath: '/research/' })}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
@@ -129,6 +130,7 @@ function buildArticlePage(item) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${fm.title} &ndash; Elysium Research</title>
+${report.metaTags({ title: `${fm.title}${fm.ticker ? ' (' + fm.ticker + ')' : ''} · Elysium Research`, description: fm.summary || fm.subtitle || 'Independent equity research from Elysium.', urlPath: `/research/${slug}.html`, type: 'article' })}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
