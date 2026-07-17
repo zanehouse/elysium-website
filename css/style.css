@@ -147,12 +147,12 @@ header {
   opacity: 1;
 }
 
-nav {
+header nav {
   display: flex;
   gap: 2.5rem;
 }
 
-nav a {
+header nav a {
   font-size: .85rem;
   letter-spacing: .14em;
   /* text-transform: uppercase; */
@@ -161,8 +161,8 @@ nav a {
   transition: color .2s;
 }
 
-nav a:hover,
-nav a.active {
+header nav a:hover,
+header nav a.active {
   color: var(--text);
   opacity: 1;
 }
@@ -192,7 +192,7 @@ nav a.active {
     display: flex;
   }
 
-  nav {
+  header nav {
     display: none;
     position: absolute;
     top: 60px;
@@ -204,11 +204,11 @@ nav a.active {
     border-bottom: 1px solid var(--border);
   }
 
-  nav.open {
+  header nav.open {
     display: flex;
   }
 
-  nav a {
+  header nav a {
     padding: 1rem 2rem;
     border-bottom: 1px solid var(--border);
   }
@@ -855,14 +855,18 @@ main {
   margin-bottom: 1rem;
 }
 
-/* ── FOOTER ── */
-footer {
+/* =========================================
+   SITE FOOTER
+   Fully self-contained classes (never the global `header nav`/`nav a`
+   rules). .footer-grid uses flex-wrap with a min column width so the
+   layout reflows fluidly at any viewport width instead of snapping
+   at one hard breakpoint.
+   ========================================= */
+.site-footer {
   border-top: 1px solid var(--border);
   padding: 3.5rem 0 2.5rem;
   margin-top: 2rem;
-  position: relative;
-  bottom: 0;
-  width: 100%
+  width: 100%;
 }
 
 .footer-inner {
@@ -871,12 +875,17 @@ footer {
   padding: 0 2rem;
 }
 
-/* ── Top: brand / site nav / connect ── */
+/* Top row: brand / site links / connect — wraps as a fluid flex row */
 .footer-grid {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem 4rem;
   padding-bottom: 2.5rem;
+}
+
+.footer-brand {
+  flex: 1 1 200px;
+  min-width: 200px;
 }
 
 .footer-logo {
@@ -897,11 +906,12 @@ footer {
 .footer-col {
   display: flex;
   flex-direction: column;
-  gap: .55rem;
-  min-width: 110px;
+  gap: .6rem;
+  flex: 0 1 120px;
+  min-width: 120px;
 }
 
-.footer-heading {
+.footer-col-heading {
   font-size: .58rem;
   letter-spacing: .18em;
   text-transform: uppercase;
@@ -909,17 +919,22 @@ footer {
   margin-bottom: .4rem;
 }
 
-.footer-col a {
+.footer-link {
   font-size: .75rem;
+  letter-spacing: .02em;
+  font-weight: 400;
+  text-transform: none;
   color: var(--muted);
+  padding: 0;
+  border: 0;
+  background: none;
   transition: color .2s;
 }
 
-.footer-col a:hover {
+.footer-link:hover {
   color: var(--text);
 }
 
-/* ── Disclaimer ── */
 .footer-disclaimer {
   font-size: .68rem;
   line-height: 1.75;
@@ -929,12 +944,11 @@ footer {
   border-top: 1px solid var(--border);
 }
 
-/* ── Bottom row ── */
 .footer-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: .75rem 1.5rem;
   flex-wrap: wrap;
   padding-top: 1.75rem;
   border-top: 1px solid var(--border);
@@ -948,14 +962,18 @@ footer {
 }
 
 @media (max-width: 640px) {
-  .footer-grid {
-    grid-template-columns: 1fr;
-    gap: 2.25rem;
+  .footer-inner {
+    padding: 0 1.25rem;
   }
 
-  .footer-bottom {
-    flex-direction: column;
-    align-items: flex-start;
+  .footer-grid {
+    gap: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  .footer-brand,
+  .footer-col {
+    flex-basis: 100%;
   }
 
   main {
