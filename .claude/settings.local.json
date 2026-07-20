@@ -12,7 +12,14 @@
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
-      "Bash(gh pr create --base main --title 'Equity Research PDF pipeline + auto-generated research index' --body ' *)"
+      "Bash(gh pr create --base main --title 'Equity Research PDF pipeline + auto-generated research index' --body ' *)",
+      "Bash(curl -s -D - -o /tmp/house.json \"https://house-stock-watcher-data.s3-us-west-2.amazonaws.com/data/all_transactions.json\" --max-time 30)",
+      "Bash(node -e \"const d=require\\('/tmp/house.json'\\); console.log\\('rows:',d.length\\); console.log\\(JSON.stringify\\(d[d.length-1],null,1\\).slice\\(0,600\\)\\);\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"senate gh raw: HTTP %{http_code}\\\\n\" \"https://raw.githubusercontent.com/timothycarambat/senate-stock-watcher-data/master/aggregate/all_transactions.json\" --max-time 20)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/timothycarambat/senate-stock-watcher-data/master/aggregate/all_transactions.json\" -o /tmp/sen.json --max-time 60)",
+      "Bash(curl -s \"https://api.github.com/repos/timothycarambat/senate-stock-watcher-data/commits?per_page=1\" --max-time 20 -H \"User-Agent: elysium-test\")",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',c=>s+=c\\).on\\('end',\\(\\)=>{const j=JSON.parse\\(s\\);console.log\\('last commit:', j[0]?.commit?.committer?.date, '-', j[0]?.commit?.message?.slice\\(0,60\\)\\);}\\)\")"
     ]
   }
 }

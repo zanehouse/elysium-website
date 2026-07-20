@@ -1,0 +1,63 @@
+name: Refresh market data
+
+# Prefetches CBOE option chains + VIX levels and commits reduced JSON into
+# assets/data/ for the free-tools pages (CBOE serves no CORS header, so the
+# browser cannot fetch it directly). Runs on the default branch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      eod:
+        description: 'Write an EOD close snapshot instead of the intraday refresh'
+        type: boolean
+        default: false
+  schedule:
+    # Every 15 min during US market hours (≈9:30–16:00 ET → 13:30–20:00 UTC),
+    # Mon–Fri. GitHub cron is UTC; adjust ±1h across DST if you want tighter bounds.
+    - cron: '*/15 13-20 * * 1-5'
+    # Once after the close (≈16:15 ET → 20:15 UTC standard time / 21:15 UTC
+    # during DST) to freeze the EOD close snapshot for the Intraday/EOD toggle.
+    - cron: '15 21 * * 1-5'
+
+# Allow the job to push the refreshed data back to the repo.
+permissions:
+  contents: write
+
+concurrency:
+  group: market-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # No npm install needed — build-market-data.mjs uses only Node built-ins
+      # and the local js/tools ESM modules.
+      - name: Fetch + reduce market data
+        env:
+          IS_EOD_SCHEDULE: ${{ github.event.schedule == '15 21 * * 1-5' }}
+          IS_EOD_DISPATCH: ${{ github.event.inputs.eod }}
+        run: |
+          if [ "$IS_EOD_SCHEDULE" = "true" ] || [ "$IS_EOD_DISPATCH" = "true" ]; then
+            node build-market-data.mjs --eod
+          else
+            node build-market-data.mjs
+          fi
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name "elysium-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/data
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "chore(data): refresh market data [skip ci]"
+            git push
+          fi

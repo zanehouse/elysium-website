@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insider Trades &ndash; Elysium Tools</title>
+  <!-- EMBED:START -->
+  <meta name="description" content="Company insider trades from SEC Form 4 filings and Congressional stock trades from House disclosures, filterable, with links to every source filing." />
+  <meta property="og:site_name" content="Elysium Capital" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Insider Trades · Elysium Tools" />
+  <meta property="og:description" content="Company insiders (SEC Form 4) and Congress (House disclosures): filterable trade feeds." />
+  <meta property="og:url" content="https://elysiumlab.markets/tools/insiders/" />
+  <meta property="og:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Insider Trades · Elysium Tools" />
+  <meta name="twitter:description" content="Company insiders and Congress trades, filterable, with source links." />
+  <meta name="twitter:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
+  <meta name="theme-color" content="#D4D4D4" />
+  <!-- EMBED:END -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+
+  <header>
+    <div class="nav-inner">
+      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium Capital"></a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="/home/">Home</a>
+        <a href="/research/">Research</a>
+        <a href="/framework/">Framework</a>
+        <a href="/tools/">Tools</a>
+        <a href="/links/">Links</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <noscript>
+      <style>.reveal{opacity:1!important;transform:none!important;transition:none!important}</style>
+      <p style="padding:3rem 0;color:#f87171">This tool requires JavaScript.</p>
+    </noscript>
+
+    <nav class="breadcrumb reveal" aria-label="Breadcrumb">
+      <a href="/home/">Home</a>
+      <span class="breadcrumb-sep">/</span>
+      <a href="/tools/">Tools</a>
+      <span class="breadcrumb-sep">/</span>
+      <span aria-current="page">Insider Trades</span>
+    </nav>
+
+    <div class="page-hero reveal">
+      <h1>Insider Trades</h1>
+      <p>Company insiders from SEC Form 4 filings, and members of Congress from House financial disclosures, filterable, with a link to every source filing.</p>
+    </div>
+
+    <div class="tool-tabs reveal">
+      <button class="tool-tab on" data-tab="company">Company Insiders</button>
+      <button class="tool-tab" data-tab="congress">Congress · House</button>
+    </div>
+
+    <div id="panel-company">
+      <div class="tool-controls reveal">
+        <span class="tool-controls-label">Ticker</span>
+        <span id="preset-btns"></span>
+        <input id="ticker-input" class="tool-input" type="text" placeholder="Ticker" maxlength="8"
+          autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Ticker" />
+        <button id="load-btn" class="tool-btn">Load</button>
+      </div>
+
+      <div class="tool-filter-bar">
+        <span class="tool-filter-label">Side</span>
+        <select id="side-filter" class="tool-filter-select">
+          <option value="all">All</option>
+          <option value="buy">Buys</option>
+          <option value="sell">Sells</option>
+        </select>
+        <span class="tool-filter-label">Min Value</span>
+        <select id="value-filter" class="tool-filter-select">
+          <option value="0">Any</option>
+          <option value="100000">≥ $100K</option>
+          <option value="1000000">≥ $1M</option>
+        </select>
+        <input id="name-filter" class="tool-input" type="text" placeholder="Insider name…" style="width:140px" />
+        <span id="company-filter-count" class="tool-filter-count"></span>
+      </div>
+
+      <div id="status" class="tool-status" hidden></div>
+
+      <section id="results" class="tool-hidden">
+        <p id="company" class="tool-selection-summary"></p>
+        <p id="mode-note" class="tool-updated"></p>
+        <div class="tool-table-wrap">
+          <table class="tool-table">
+            <thead id="thead"></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <p id="updated" class="tool-updated"></p>
+      </section>
+    </div>
+
+    <div id="panel-congress" class="tool-hidden">
+      <div class="tool-filter-bar">
+        <input id="congress-name-filter" class="tool-input" type="text" placeholder="Member name…" style="width:160px" />
+        <input id="congress-state-filter" class="tool-input" type="text" placeholder="State/district (e.g. TX)…" style="width:160px" />
+        <span id="congress-filter-count" class="tool-filter-count"></span>
+      </div>
+
+      <div id="congress-status" class="tool-status" hidden></div>
+
+      <section id="congress-results" class="tool-hidden">
+        <div class="tool-table-wrap">
+          <table class="tool-table">
+            <thead>
+              <tr><th>Filed</th><th>Member</th><th>District</th><th>Report</th></tr>
+            </thead>
+            <tbody id="congress-tbody"></tbody>
+          </table>
+        </div>
+        <p id="congress-updated" class="tool-updated"></p>
+      </section>
+    </div>
+
+    <p class="tool-note">
+      <b>Company Insiders</b> — source: SEC EDGAR, Form 4 filings only (officers, directors, and 10% owners).
+      Covered names carry full transaction detail (insider, type, shares, price), parsed and refreshed periodically;
+      any other ticker loads live from EDGAR as a filing list with links — the SEC does not permit browsers to read
+      the transaction XML directly, so detail for uncovered tickers opens on EDGAR. Transaction codes: <b>P</b> buy,
+      <b>S</b> sell, <b>A</b> grant, <b>F</b> tax withholding, <b>M</b> option exercise, <b>G</b> gift.
+      <b>Congress</b> — source: the official House Clerk financial-disclosure index, Periodic Transaction Reports
+      (stock trades) only. The House publishes no machine-readable transaction detail — the linked PDF report is
+      the source of truth for what was bought or sold. Senate disclosures aren't covered here; see
+      <a href="https://efdsearch.senate.gov/search/" target="_blank" rel="noopener noreferrer">efdsearch.senate.gov</a>.
+      Filings are delayed by SEC/House reporting deadlines. Not investment advice.
+    </p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img class="footer-logo" src="/assets/logo.png" alt="Elysium Capital" />
+          <p class="footer-tagline">Independent Macro Research</p>
+          <p class="footer-disclaimer">
+            Content published by Elysium Capital is for informational and educational purposes only and does
+            not constitute financial, investment, tax, or legal advice, nor an offer or solicitation to buy
+            or sell any security.
+          </p>
+        </div>
+        <nav class="footer-col" aria-label="Footer">
+          <span class="footer-col-heading">Site</span>
+          <a class="footer-link" href="/home/">Home</a>
+          <a class="footer-link" href="/research/">Research</a>
+          <a class="footer-link" href="/framework/">Framework</a>
+          <a class="footer-link" href="/tools/">Tools</a>
+          <a class="footer-link" href="/links/">Links</a>
+        </nav>
+        <div class="footer-col">
+          <span class="footer-col-heading">Connect</span>
+          <a class="footer-link" href="https://x.com/elysiumfirm" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+          <a class="footer-link" href="mailto:research@elysiumlab.markets">Email</a>
+          <a class="footer-link" href="https://discord.gg/scale" target="_blank" rel="noopener noreferrer">Discord</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium Capital. All rights reserved.</span>
+        <span class="footer-copy">Not investment advice &nbsp;&middot;&nbsp; Not for distribution</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/load.js" defer></script>
+  <script type="module" src="/js/tools/insiders-page.js"></script>
+
+</body>
+
+</html>

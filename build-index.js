@@ -78,6 +78,7 @@ ${report.metaTags({ title: 'Elysium Research Archive', description: 'Independent
         <a href="/home/">Home</a>
         <a href="/research/" class="active">Research</a>
         <a href="/framework/">Framework</a>
+        <a href="/tools/">Tools</a>
         <a href="/links/">Links</a>
       </nav>
     </div>
@@ -149,6 +150,7 @@ ${report.metaTags({ title: `${fm.title}${fm.ticker ? ' (' + fm.ticker + ')' : ''
         <a href="/home/">Home</a>
         <a href="/research/" class="active">Research</a>
         <a href="/framework/">Framework</a>
+        <a href="/tools/">Tools</a>
         <a href="/links/">Links</a>
       </nav>
     </div>
