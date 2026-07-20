@@ -1,0 +1,62 @@
+name: Refresh daily data
+
+# Prefetches everything that only needs to update a few times a day (not the
+# 15-minute options-chain cadence handled by market-data.yml):
+#   - SEC Form 4 insider filings (www.sec.gov's Form 4 XML has no CORS header,
+#     so this must run server-side, not in the browser)
+#   - House Clerk congressional financial disclosures (official index, ZIP+XML,
+#     no CORS issue since it's a Node job)
+#   - FRED macro series (CPI, Fed funds, balance sheet, yields, M2, RRP) — no
+#     API key needed, but daily series run to 10,000+ rows so they're reduced
+#     here rather than fetched per-visitor
+# All three write small reduced JSON into assets/data/ that the static pages
+# load directly.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # 13:00 and 22:00 UTC on weekdays (after the US filing/trading day).
+    - cron: '0 13,22 * * 1-5'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # All four scripts use only Node built-ins and the local js/tools ESM
+      # modules — no npm install needed.
+      - name: Refresh ticker map
+        run: node build-tickers.js
+
+      - name: Fetch + parse Form 4 filings
+        run: node build-insiders.mjs
+
+      - name: Fetch House financial disclosures
+        run: node build-congress.mjs
+
+      - name: Fetch FRED macro series
+        run: node build-fred.mjs
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name "elysium-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/data/insiders assets/data/insiders-manifest.json assets/data/ticker-cik.json assets/data/congress.json assets/data/macro-fred.json
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "chore(data): refresh daily data [skip ci]"
+            git push
+          fi

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Macro Dashboard &ndash; Elysium Tools</title>
+  <!-- EMBED:START -->
+  <meta name="description" content="Sentiment gauge, Fed regime 2x2 matrix, inflation, rates, and liquidity charts, sourced from CBOE and FRED, free and auto-refreshed." />
+  <meta property="og:site_name" content="Elysium Capital" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Macro Dashboard · Elysium Tools" />
+  <meta property="og:description" content="Sentiment gauge, Fed regime 2x2 matrix, inflation, rates, and liquidity charts, sourced from CBOE and FRED." />
+  <meta property="og:url" content="https://elysiumlab.markets/tools/macro/" />
+  <meta property="og:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Macro Dashboard · Elysium Tools" />
+  <meta name="twitter:description" content="Sentiment, Fed regime matrix, inflation, rates, and liquidity, from CBOE and FRED." />
+  <meta name="twitter:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
+  <meta name="theme-color" content="#D4D4D4" />
+  <!-- EMBED:END -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+
+  <header>
+    <div class="nav-inner">
+      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium Capital"></a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="/home/">Home</a>
+        <a href="/research/">Research</a>
+        <a href="/framework/">Framework</a>
+        <a href="/tools/">Tools</a>
+        <a href="/links/">Links</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <noscript>
+      <style>.reveal{opacity:1!important;transform:none!important;transition:none!important}</style>
+      <p style="padding:3rem 0;color:#f87171">This tool requires JavaScript.</p>
+    </noscript>
+
+    <nav class="breadcrumb reveal" aria-label="Breadcrumb">
+      <a href="/home/">Home</a>
+      <span class="breadcrumb-sep">/</span>
+      <a href="/tools/">Tools</a>
+      <span class="breadcrumb-sep">/</span>
+      <span aria-current="page">Macro Dashboard</span>
+    </nav>
+
+    <div class="page-hero reveal">
+      <h1>Macro Dashboard</h1>
+      <p>Sentiment, the Fed policy regime, inflation, rates, and liquidity: one page, all sourced from CBOE and FRED, refreshed automatically.</p>
+    </div>
+
+    <div id="status" class="tool-status" hidden></div>
+
+    <section id="results" class="tool-hidden">
+
+      <p class="tool-subhead">Sentiment</p>
+      <div class="tool-sentiment-row">
+        <div class="tool-chart-wrap tool-sentiment-gauge">
+          <canvas id="gauge-chart"></canvas>
+        </div>
+        <div class="tool-meters" id="meters"></div>
+      </div>
+
+      <p class="tool-subhead">Fed Regime Matrix</p>
+      <div class="tool-stats" id="matrix-stats"></div>
+      <div class="tool-matrix-wrap">
+        <div class="tool-matrix-yaxis"><span>High Rates</span><span>Low Rates</span></div>
+        <div class="tool-matrix-body">
+          <div class="tool-matrix-grid" id="matrix-grid"></div>
+          <div class="tool-matrix-xaxis"><span>Expanding Balance Sheet</span><span>Shrinking Balance Sheet</span></div>
+        </div>
+      </div>
+
+      <p class="tool-subhead">Inflation</p>
+      <div class="tool-stats" id="inflation-stats"></div>
+      <div class="tool-chart-wrap">
+        <canvas id="inflation-chart"></canvas>
+      </div>
+
+      <p class="tool-subhead">Policy</p>
+      <div class="tool-chart-wrap">
+        <canvas id="policy-chart"></canvas>
+      </div>
+
+      <p class="tool-subhead">Bonds</p>
+      <div class="tool-stats" id="bonds-stats"></div>
+      <div class="tool-chart-wrap short">
+        <canvas id="curve-chart"></canvas>
+      </div>
+      <div class="tool-chart-wrap short">
+        <canvas id="spread-chart"></canvas>
+      </div>
+
+      <p class="tool-subhead">Money &amp; Liquidity</p>
+      <div class="tool-chart-wrap short">
+        <canvas id="m2-chart"></canvas>
+      </div>
+      <div class="tool-chart-wrap short">
+        <canvas id="rrp-chart"></canvas>
+      </div>
+
+      <p id="updated" class="tool-updated"></p>
+    </section>
+
+    <p class="tool-note">
+      <b>Sentiment</b> runs 0 (extreme fear) to 100 (complacency), the mean of: VIX level (10→100, 40→0), VIX term
+      structure VIX/VIX3M (0.80→100 contango, 1.10→0 backwardation), and SPY put/call volume (0.70→100, 1.30→0).
+      <b>Fed Regime Matrix</b>: rate level is <b>high</b> at Fed Funds ≥ 3.0%, else <b>low</b>; balance sheet is
+      <b>expanding</b> when the 3-month change in the Fed's asset holdings (WALCL) is ≥ 0%, else <b>shrinking</b> —
+      each quadrant implies a different equity posture (see cells above). <b>Inflation</b> figures are year-over-year.
+      Sources: CBOE (15-minute delayed) for sentiment; FRED (Federal Reserve Economic Data) for everything else,
+      refreshed twice daily. Rates, the balance sheet, and overnight RRP update daily/weekly per their own FRED
+      release schedule; CPI, PCE, unemployment, and the Fed funds rate are published monthly, roughly 1-6 weeks
+      after the month they cover, so the date shown next to each reading (e.g. "06/26") is the most recent one
+      BLS/the Fed have actually released, not a delay in this page. Not investment advice.
+    </p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img class="footer-logo" src="/assets/logo.png" alt="Elysium Capital" />
+          <p class="footer-tagline">Independent Macro Research</p>
+          <p class="footer-disclaimer">
+            Content published by Elysium Capital is for informational and educational purposes only and does
+            not constitute financial, investment, tax, or legal advice, nor an offer or solicitation to buy
+            or sell any security.
+          </p>
+        </div>
+        <nav class="footer-col" aria-label="Footer">
+          <span class="footer-col-heading">Site</span>
+          <a class="footer-link" href="/home/">Home</a>
+          <a class="footer-link" href="/research/">Research</a>
+          <a class="footer-link" href="/framework/">Framework</a>
+          <a class="footer-link" href="/tools/">Tools</a>
+          <a class="footer-link" href="/links/">Links</a>
+        </nav>
+        <div class="footer-col">
+          <span class="footer-col-heading">Connect</span>
+          <a class="footer-link" href="https://x.com/elysiumfirm" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+          <a class="footer-link" href="mailto:research@elysiumlab.markets">Email</a>
+          <a class="footer-link" href="https://discord.gg/scale" target="_blank" rel="noopener noreferrer">Discord</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium Capital. All rights reserved.</span>
+        <span class="footer-copy">Not investment advice &nbsp;&middot;&nbsp; Not for distribution</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js" defer></script>
+  <script src="/js/script.js"></script>
+  <script src="/js/load.js" defer></script>
+  <script type="module" src="/js/tools/macro-page.js"></script>
+
+</body>
+
+</html>

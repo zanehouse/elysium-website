@@ -4,7 +4,14 @@
   "description": "Elysium Equity Research PDF Pipeline",
   "main": "build.js",
   "scripts": {
-    "build": "node build.js"
+    "build": "node build.js",
+    "build:site": "node build-index.js",
+    "data:gex": "node build-market-data.mjs",
+    "data:insiders": "node build-insiders.mjs",
+    "data:congress": "node build-congress.mjs",
+    "data:fred": "node build-fred.mjs",
+    "data:tickers": "node build-tickers.js",
+    "test": "node --test \"js/tools/test/*.test.js\""
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

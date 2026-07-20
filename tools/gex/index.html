@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gamma Exposure (GEX) &ndash; Elysium Tools</title>
+  <!-- EMBED:START -->
+  <meta name="description" content="Net dealer gamma exposure by strike with automatic contract selection: zero-gamma flip, call wall, and put wall. Free, CBOE-delayed data." />
+  <meta property="og:site_name" content="Elysium Capital" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Gamma Exposure (GEX) · Elysium Tools" />
+  <meta property="og:description" content="Net dealer gamma exposure by strike with automatic contract selection: zero-gamma flip, call wall, and put wall. Free, CBOE-delayed data." />
+  <meta property="og:url" content="https://elysiumlab.markets/tools/gex/" />
+  <meta property="og:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Gamma Exposure (GEX) · Elysium Tools" />
+  <meta name="twitter:description" content="Net dealer gamma exposure by strike with automatic contract selection." />
+  <meta name="twitter:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
+  <meta name="theme-color" content="#D4D4D4" />
+  <!-- EMBED:END -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+
+  <header>
+    <div class="nav-inner">
+      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium Capital"></a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="/home/">Home</a>
+        <a href="/research/">Research</a>
+        <a href="/framework/">Framework</a>
+        <a href="/tools/">Tools</a>
+        <a href="/links/">Links</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <noscript>
+      <style>.reveal{opacity:1!important;transform:none!important;transition:none!important}</style>
+      <p style="padding:3rem 0;color:#f87171">This tool requires JavaScript.</p>
+    </noscript>
+
+    <nav class="breadcrumb reveal" aria-label="Breadcrumb">
+      <a href="/home/">Home</a>
+      <span class="breadcrumb-sep">/</span>
+      <a href="/tools/">Tools</a>
+      <span class="breadcrumb-sep">/</span>
+      <span aria-current="page">Gamma Exposure</span>
+    </nav>
+
+    <div class="page-hero reveal">
+      <h1>Gamma Exposure</h1>
+      <p>Net dealer gamma by strike. The engine auto-selects the expiries and strikes that matter, then locates the zero-gamma flip and the gamma walls. Search any optionable ticker; prefetched symbols load instantly, and anything else gets looked up live.</p>
+    </div>
+
+    <div class="tool-controls reveal">
+      <span class="tool-controls-label">Symbol</span>
+      <span id="preset-btns"></span>
+      <input id="symbol-input" class="tool-input" type="text" placeholder="Any ticker…" maxlength="8"
+        autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Symbol"
+        list="gex-symbol-list" />
+      <datalist id="gex-symbol-list"></datalist>
+      <button id="load-btn" class="tool-btn">Load</button>
+    </div>
+
+    <div id="status" class="tool-status" hidden></div>
+
+    <section id="results" class="tool-hidden">
+      <div class="tool-filter-bar">
+        <span class="tool-filter-label">Expiration</span>
+        <select id="expiry-select" class="tool-filter-select" aria-label="Expiration"></select>
+
+        <span class="tool-filter-label">Snapshot</span>
+        <span id="snapshot-toggle" class="tool-toggle-group"></span>
+
+        <span class="tool-filter-label">Weight by</span>
+        <span id="weight-toggle" class="tool-toggle-group"></span>
+      </div>
+
+      <p id="selection-summary" class="tool-selection-summary"></p>
+
+      <div class="tool-stats" id="stats"></div>
+
+      <div class="tool-chart-wrap">
+        <canvas id="gex-chart"></canvas>
+      </div>
+
+      <p id="updated" class="tool-updated"></p>
+    </section>
+
+    <p class="tool-note">
+      <b>Convention:</b> dollar gamma per 1% move — per contract <code>Γ × weight × 100 × Spot² × 0.01</code>,
+      with calls contributing positive gamma and puts negative (naive dealer-positioning assumption). Weight is
+      open interest by default (settled overnight, the standard) or today's traded volume if you switch the
+      <b>Weight by</b> toggle — volume-weighting reflects today's flow rather than resting positioning.
+      Bars show net gamma by strike (green positive, red negative); the line is the cumulative profile, and the
+      <b>zero-gamma flip</b> is where it crosses zero nearest spot. The <b>call wall</b> / <b>put wall</b> are the
+      strikes of largest positive / negative net gamma. The <b>Expiration</b> dropdown auto-selects the contracts
+      that matter (0DTE plus every expiry within 30 days plus the next monthly OPEX) by default — pick "All",
+      a date range, or any individual expiration out to LEAPS. Strikes are always limited to ±12% of spot, above
+      a per-symbol open-interest floor, and must have traded at least one contract today — this drops strikes
+      carrying stale, untouched-today open interest that would otherwise stretch the chart's strike axis out with
+      little to show for it. The <b>Snapshot</b> toggle switches between the latest intraday chain and
+      a frozen end-of-day close snapshot (prefetched symbols only). Prefetched symbols (~60 liquid indices, ETFs,
+      and megacaps) load instantly and refresh every 15 minutes; any other ticker is looked up live by racing
+      several public CORS proxies at once, since CBOE's chain endpoint isn't directly reachable from a browser —
+      this is best-effort and can occasionally be slow or unavailable if every proxy is down at once.
+      Data: CBOE 15-minute delayed. Not investment advice.
+    </p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img class="footer-logo" src="/assets/logo.png" alt="Elysium Capital" />
+          <p class="footer-tagline">Independent Macro Research</p>
+          <p class="footer-disclaimer">
+            Content published by Elysium Capital is for informational and educational purposes only and does
+            not constitute financial, investment, tax, or legal advice, nor an offer or solicitation to buy
+            or sell any security.
+          </p>
+        </div>
+        <nav class="footer-col" aria-label="Footer">
+          <span class="footer-col-heading">Site</span>
+          <a class="footer-link" href="/home/">Home</a>
+          <a class="footer-link" href="/research/">Research</a>
+          <a class="footer-link" href="/framework/">Framework</a>
+          <a class="footer-link" href="/tools/">Tools</a>
+          <a class="footer-link" href="/links/">Links</a>
+        </nav>
+        <div class="footer-col">
+          <span class="footer-col-heading">Connect</span>
+          <a class="footer-link" href="https://x.com/elysiumfirm" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+          <a class="footer-link" href="mailto:research@elysiumlab.markets">Email</a>
+          <a class="footer-link" href="https://discord.gg/scale" target="_blank" rel="noopener noreferrer">Discord</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium Capital. All rights reserved.</span>
+        <span class="footer-copy">Not investment advice &nbsp;&middot;&nbsp; Not for distribution</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js" defer></script>
+  <script src="/js/script.js"></script>
+  <script src="/js/load.js" defer></script>
+  <script type="module" src="/js/tools/gex-page.js"></script>
+
+</body>
+
+</html>

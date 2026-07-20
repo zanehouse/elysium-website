@@ -1,0 +1,6 @@
+{
+  "name": "elysium-tools",
+  "private": true,
+  "type": "module",
+  "description": "Shared ESM modules for the Elysium free-tools section. type:module lets Node run these under `node --test`; the browser loads them as <script type=module>."
+}
