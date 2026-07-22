@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-22T15:08:48.554Z",
+  "generated": "2026-07-22T23:09:46.680Z",
   "symbols": [
     "GLD",
     "SLV",
@@ -44,6 +44,12 @@
     "PLTR",
     "COIN",
     "MSTR",
-    "HOOD"
+    "HOOD",
+    "SOFI",
+    "RIVN",
+    "SNAP",
+    "DKNG",
+    "GME",
+    "AMC"
   ]
 }
