@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-28T15:22:16.802Z",
+  "generated": "2026-07-28T16:59:11.617Z",
   "gex": [
     "SPX",
     "SPY",
@@ -60,7 +60,6 @@
     "MSTR",
     "HOOD",
     "SOFI",
-    "RIVN",
     "SNAP",
     "DKNG",
     "GME",
@@ -69,33 +68,33 @@
   "symbols": [
     {
       "symbol": "SPX",
-      "spot": 7410.1,
-      "contracts": 6749
+      "spot": 7443.71,
+      "contracts": 6685
     },
     {
       "symbol": "SPY",
-      "spot": 738.72,
-      "contracts": 2446
+      "spot": 741.94,
+      "contracts": 2441
     },
     {
       "symbol": "QQQ",
-      "spot": 673.22,
-      "contracts": 1626
+      "spot": 678.14,
+      "contracts": 1621
     },
     {
       "symbol": "IWM",
-      "spot": 291.58,
-      "contracts": 894
+      "spot": 293.14,
+      "contracts": 892
     },
     {
       "symbol": "RUT",
-      "spot": 2933.89,
-      "contracts": 773
+      "spot": 2949.29,
+      "contracts": 755
     },
     {
       "symbol": "NDX",
-      "spot": 27680.84,
-      "contracts": 425
+      "spot": 27866.97,
+      "contracts": 434
     },
     {
       "symbol": "DIA",
@@ -104,132 +103,132 @@
     },
     {
       "symbol": "XSP",
-      "spot": 741.14,
-      "contracts": 1322
+      "spot": 744.24,
+      "contracts": 1312
     },
     {
       "symbol": "TLT",
-      "spot": 83.96,
+      "spot": 84.31,
       "contracts": 846
     },
     {
       "symbol": "GLD",
-      "spot": 369.1,
-      "contracts": 908
+      "spot": 370.72,
+      "contracts": 918
     },
     {
       "symbol": "SLV",
-      "spot": 51.48,
-      "contracts": 703
+      "spot": 51.85,
+      "contracts": 693
     },
     {
       "symbol": "XLE",
-      "spot": 58.33,
-      "contracts": 312
+      "spot": 57.47,
+      "contracts": 321
     },
     {
       "symbol": "XLF",
-      "spot": 57.26,
-      "contracts": 381
+      "spot": 57.48,
+      "contracts": 386
     },
     {
       "symbol": "XLK",
-      "spot": 168.56,
-      "contracts": 232
+      "spot": 170.95,
+      "contracts": 226
     },
     {
       "symbol": "SMH",
-      "spot": 527.26,
-      "contracts": 668
+      "spot": 532.37,
+      "contracts": 659
     },
     {
       "symbol": "ARKK",
-      "spot": 71.11,
-      "contracts": 191
+      "spot": 72.37,
+      "contracts": 205
     },
     {
       "symbol": "AAPL",
-      "spot": 338,
-      "contracts": 579
+      "spot": 339.72,
+      "contracts": 594
     },
     {
       "symbol": "NVDA",
-      "spot": 196.5,
-      "contracts": 653
+      "spot": 197.67,
+      "contracts": 655
     },
     {
       "symbol": "TSLA",
-      "spot": 304.5,
-      "contracts": 585
+      "spot": 307.52,
+      "contracts": 564
     },
     {
       "symbol": "AMZN",
-      "spot": 229.13,
-      "contracts": 491
+      "spot": 231.29,
+      "contracts": 493
     },
     {
       "symbol": "MSFT",
-      "spot": 396.63,
-      "contracts": 639
+      "spot": 398.35,
+      "contracts": 640
     },
     {
       "symbol": "META",
-      "spot": 588.16,
-      "contracts": 627
+      "spot": 595.3,
+      "contracts": 622
     },
     {
       "symbol": "GOOGL",
-      "spot": 329.8,
-      "contracts": 642
+      "spot": 333.9,
+      "contracts": 670
     },
     {
       "symbol": "GOOG",
-      "spot": 329.76,
-      "contracts": 505
+      "spot": 333.31,
+      "contracts": 528
     },
     {
       "symbol": "AMD",
-      "spot": 452.82,
-      "contracts": 474
+      "spot": 460.76,
+      "contracts": 459
     },
     {
       "symbol": "NFLX",
-      "spot": 72.74,
-      "contracts": 454
+      "spot": 73.22,
+      "contracts": 456
     },
     {
       "symbol": "AVGO",
-      "spot": 378.75,
-      "contracts": 416
+      "spot": 383.25,
+      "contracts": 438
     },
     {
       "symbol": "CRM",
-      "spot": 182.38,
-      "contracts": 225
+      "spot": 183.3,
+      "contracts": 241
     },
     {
       "symbol": "ORCL",
-      "spot": 117.72,
-      "contracts": 280
+      "spot": 120.86,
+      "contracts": 287
     },
     {
       "symbol": "ADBE",
-      "spot": 249.9,
-      "contracts": 185
+      "spot": 253.36,
+      "contracts": 188
     },
     {
       "symbol": "INTC",
-      "spot": 85.93,
-      "contracts": 331
+      "spot": 86.59,
+      "contracts": 339
     },
     {
       "symbol": "MU",
-      "spot": 815.36,
-      "contracts": 641
+      "spot": 824.64,
+      "contracts": 625
     },
     {
       "symbol": "QCOM",
-      "spot": 166.02,
+      "spot": 165.75,
       "contracts": 216
     },
     {
@@ -239,38 +238,38 @@
     },
     {
       "symbol": "BAC",
-      "spot": 62.37,
+      "spot": 62.38,
       "contracts": 224
     },
     {
       "symbol": "GS",
-      "spot": 1025.77,
-      "contracts": 211
+      "spot": 1043.82,
+      "contracts": 217
     },
     {
       "symbol": "V",
-      "spot": 364.79,
-      "contracts": 235
+      "spot": 368.85,
+      "contracts": 237
     },
     {
       "symbol": "MA",
-      "spot": 562.2,
+      "spot": 560.95,
       "contracts": 109
     },
     {
       "symbol": "XOM",
-      "spot": 155.43,
+      "spot": 153.5,
       "contracts": 267
     },
     {
       "symbol": "CVX",
-      "spot": 190.58,
+      "spot": 188.44,
       "contracts": 193
     },
     {
       "symbol": "BA",
-      "spot": 215.49,
-      "contracts": 249
+      "spot": 222.47,
+      "contracts": 265
     },
     {
       "symbol": "CAT",
@@ -279,23 +278,23 @@
     },
     {
       "symbol": "F",
-      "spot": 14.76,
-      "contracts": 111
+      "spot": 14.88,
+      "contracts": 128
     },
     {
       "symbol": "GM",
-      "spot": 88.94,
-      "contracts": 115
+      "spot": 90.76,
+      "contracts": 111
     },
     {
       "symbol": "COST",
-      "spot": 982.64,
-      "contracts": 242
+      "spot": 971.89,
+      "contracts": 234
     },
     {
       "symbol": "WMT",
-      "spot": 114.72,
-      "contracts": 253
+      "spot": 113.74,
+      "contracts": 261
     },
     {
       "symbol": "HD",
@@ -304,32 +303,32 @@
     },
     {
       "symbol": "DIS",
-      "spot": 97.91,
-      "contracts": 177
+      "spot": 98.39,
+      "contracts": 178
     },
     {
       "symbol": "LLY",
-      "spot": 1230.61,
-      "contracts": 154
+      "spot": 1216.64,
+      "contracts": 155
     },
     {
       "symbol": "UNH",
-      "spot": 418.8,
-      "contracts": 283
+      "spot": 427.02,
+      "contracts": 275
     },
     {
       "symbol": "UBER",
-      "spot": 69.69,
-      "contracts": 258
+      "spot": 69.51,
+      "contracts": 234
     },
     {
       "symbol": "SHOP",
-      "spot": 131.38,
+      "spot": 132.56,
       "contracts": 176
     },
     {
       "symbol": "PYPL",
-      "spot": 58.29,
+      "spot": 58.38,
       "contracts": 187
     },
     {
@@ -339,38 +338,33 @@
     },
     {
       "symbol": "PLTR",
-      "spot": 121.57,
-      "contracts": 396
+      "spot": 124.18,
+      "contracts": 407
     },
     {
       "symbol": "COIN",
-      "spot": 163.03,
-      "contracts": 358
+      "spot": 166.98,
+      "contracts": 360
     },
     {
       "symbol": "MSTR",
-      "spot": 96.41,
-      "contracts": 348
+      "spot": 97.55,
+      "contracts": 352
     },
     {
       "symbol": "HOOD",
-      "spot": 90.79,
-      "contracts": 286
+      "spot": 93.23,
+      "contracts": 333
     },
     {
       "symbol": "SOFI",
-      "spot": 16.42,
-      "contracts": 170
-    },
-    {
-      "symbol": "RIVN",
-      "spot": 16.22,
-      "contracts": 151
+      "spot": 16.71,
+      "contracts": 172
     },
     {
       "symbol": "SNAP",
-      "spot": 4.66,
-      "contracts": 45
+      "spot": 4.73,
+      "contracts": 28
     },
     {
       "symbol": "DKNG",
@@ -379,17 +373,17 @@
     },
     {
       "symbol": "GME",
-      "spot": 21.84,
+      "spot": 21.96,
       "contracts": 204
     },
     {
       "symbol": "AMC",
-      "spot": 2.53,
+      "spot": 2.59,
       "contracts": 12
     }
   ],
   "macro": {
-    "composite": 49,
+    "composite": 53,
     "label": "Neutral"
   },
   "gexEod": [
