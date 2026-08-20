@@ -1,29 +1,29 @@
 {
-  "generated": "2026-08-20T17:14:30.968Z",
-  "composite": 57,
+  "generated": "2026-08-20T17:48:24.694Z",
+  "composite": 56,
   "label": "Greed",
   "components": [
     {
       "key": "vix",
       "label": "VIX Level",
-      "reading": "15.62",
-      "raw": 15.62,
+      "reading": "15.85",
+      "raw": 15.85,
       "score": 81,
       "read": "Complacent"
     },
     {
       "key": "term",
       "label": "VIX Term Structure",
-      "reading": "VIX/VIX3M 0.829",
-      "raw": 0.8286472148541113,
-      "score": 90,
+      "reading": "VIX/VIX3M 0.836",
+      "raw": 0.8359704641350211,
+      "score": 88,
       "read": "Complacent"
     },
     {
       "key": "pc",
       "label": "SPY Put/Call (vol)",
-      "reading": "1.37",
-      "raw": 1.3723716759748332,
+      "reading": "1.38",
+      "raw": 1.382821091244956,
       "score": 0,
       "read": "Very fearful"
     }
