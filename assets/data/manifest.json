@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-04T21:41:34.681Z",
+  "generated": "2026-09-04T23:04:34.106Z",
   "gex": [
     "SPX",
     "SPY",
@@ -416,8 +416,7 @@
     "MSTR",
     "HOOD",
     "SOFI",
-    "RIVN",
-    "SNAP"
+    "RIVN"
   ],
-  "eodGenerated": "2026-09-03T23:19:25.710Z"
+  "eodGenerated": "2026-09-04T23:04:34.106Z"
 }
