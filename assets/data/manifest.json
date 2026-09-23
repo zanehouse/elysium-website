@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-23T20:43:32.801Z",
+  "generated": "2026-09-23T23:13:17.756Z",
   "gex": [
     "SPX",
     "SPY",
@@ -58,7 +58,13 @@
     "PLTR",
     "COIN",
     "MSTR",
-    "HOOD"
+    "HOOD",
+    "SOFI",
+    "RIVN",
+    "SNAP",
+    "DKNG",
+    "GME",
+    "AMC"
   ],
   "symbols": [
     {
@@ -350,6 +356,36 @@
       "symbol": "HOOD",
       "spot": 123.82,
       "contracts": 429
+    },
+    {
+      "symbol": "SOFI",
+      "spot": 17.21,
+      "contracts": 181
+    },
+    {
+      "symbol": "RIVN",
+      "spot": 15.13,
+      "contracts": 156
+    },
+    {
+      "symbol": "SNAP",
+      "spot": 5.64,
+      "contracts": 52
+    },
+    {
+      "symbol": "DKNG",
+      "spot": 21.85,
+      "contracts": 87
+    },
+    {
+      "symbol": "GME",
+      "spot": 24.07,
+      "contracts": 215
+    },
+    {
+      "symbol": "AMC",
+      "spot": 2.94,
+      "contracts": 23
     }
   ],
   "macro": {
