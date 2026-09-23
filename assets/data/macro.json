@@ -1,7 +1,7 @@
 {
-  "generated": "2026-09-22T23:13:14.151Z",
-  "composite": 85,
-  "label": "Complacency",
+  "generated": "2026-09-23T17:45:37.646Z",
+  "composite": 75,
+  "label": "Greed",
   "components": [
     {
       "key": "vix",
@@ -22,10 +22,10 @@
     {
       "key": "pc",
       "label": "SPY Put/Call (vol)",
-      "reading": "0.88",
-      "raw": 0.8806853831010638,
-      "score": 70,
-      "read": "Calm"
+      "reading": "1.05",
+      "raw": 1.045268330301636,
+      "score": 42,
+      "read": "Fearful"
     }
   ]
 }
