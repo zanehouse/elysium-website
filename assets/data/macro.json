@@ -1,31 +1,31 @@
 {
-  "generated": "2026-10-06T18:48:47.384Z",
-  "composite": 81,
+  "generated": "2026-10-06T22:55:26.396Z",
+  "composite": 76,
   "label": "Complacency",
   "components": [
     {
       "key": "vix",
       "label": "VIX Level",
-      "reading": "15.05",
-      "raw": 15.05,
+      "reading": "15.01",
+      "raw": 15.01,
       "score": 83,
       "read": "Complacent"
     },
     {
       "key": "term",
       "label": "VIX Term Structure",
-      "reading": "VIX/VIX3M 0.854",
-      "raw": 0.853658536585366,
-      "score": 82,
+      "reading": "VIX/VIX3M 0.851",
+      "raw": 0.850907029478458,
+      "score": 83,
       "read": "Complacent"
     },
     {
       "key": "pc",
       "label": "SPY Put/Call (vol)",
-      "reading": "0.83",
-      "raw": 0.8322050259358658,
-      "score": 78,
-      "read": "Complacent"
+      "reading": "0.92",
+      "raw": 0.9209035718260256,
+      "score": 63,
+      "read": "Calm"
     }
   ]
 }
