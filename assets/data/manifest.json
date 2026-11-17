@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-16T22:45:23.169Z",
+  "generated": "2026-11-17T03:56:37.883Z",
   "gex": [
     "SPX",
     "SPY",
@@ -440,7 +440,6 @@
     "UBER",
     "SHOP",
     "PYPL",
-    "ROKU",
     "PLTR",
     "COIN",
     "MSTR",
@@ -452,5 +451,5 @@
     "GME",
     "AMC"
   ],
-  "eodGenerated": "2026-11-14T01:28:25.045Z"
+  "eodGenerated": "2026-11-17T03:56:37.884Z"
 }
