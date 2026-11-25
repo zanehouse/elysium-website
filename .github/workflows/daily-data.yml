@@ -15,8 +15,15 @@ name: Refresh daily data
 on:
   workflow_dispatch: {}
   schedule:
-    # 13:00 and 22:00 UTC on weekdays (after the US filing/trading day).
-    - cron: '0 13,22 * * 1-5'
+    # Every day, not just weekdays: the old `* * 1-5` left a 64-hour hole from
+    # Friday evening to Monday morning, which was the most visible source of
+    # "the data is days old". Now that the build scripts skip writing unchanged
+    # payloads, a weekend run that finds nothing new commits nothing.
+    #
+    # Offset minutes, and deliberately clear of market-data.yml's 13:26/17:26
+    # starts — the old 13:00 slot collided with a market-data tick, and since
+    # neither job rebased before pushing, the loser's entire run was discarded.
+    - cron: '41 11,23 * * *'
 
 permissions:
   contents: write
@@ -28,8 +35,11 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # needed to rebase on a rejected push
 
       - uses: actions/setup-node@v4
         with:
@@ -37,26 +47,75 @@ jobs:
 
       # All four scripts use only Node built-ins and the local js/tools ESM
       # modules — no npm install needed.
+      #
+      # continue-on-error on each: these are four independent upstreams, and the
+      # commit step used to sit behind all of them with no `if: always()`, so a
+      # FRED outage in the last step threw away the ticker map, Form 4 data and
+      # congress data already fetched in the same run.
       - name: Refresh ticker map
+        id: tickers
+        continue-on-error: true
         run: node build-tickers.js
 
       - name: Fetch + parse Form 4 filings
+        id: insiders
+        continue-on-error: true
         run: node build-insiders.mjs
 
       - name: Fetch House financial disclosures
+        id: congress
+        continue-on-error: true
         run: node build-congress.mjs
 
       - name: Fetch FRED macro series
+        id: fred
+        continue-on-error: true
         run: node build-fred.mjs
 
       - name: Commit refreshed data
+        if: always()
+        env:
+          BRANCH: ${{ github.ref_name }}
         run: |
           git config user.name "elysium-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add assets/data/insiders assets/data/insiders-manifest.json assets/data/ticker-cik.json assets/data/congress.json assets/data/macro-fred.json
+          # Broad add rather than an explicit path list: the old enumeration
+          # hard-failed with "pathspec did not match any files" if any single
+          # output was missing. This job never touches gex/ or manifest.json.
+          git add -A assets/data
           if git diff --cached --quiet; then
             echo "No data changes."
-          else
-            git commit -m "chore(data): refresh daily data [skip ci]"
-            git push
+            exit 0
           fi
+          git commit -m "chore(data): refresh daily data [skip ci]"
+          # market-data.yml pushes to this same branch. Neither job used to
+          # rebase first, so on a collision the loser's whole run was discarded.
+          for _ in 1 2 3 4 5; do
+            if git push origin "HEAD:$BRANCH"; then
+              echo "Pushed."
+              exit 0
+            fi
+            echo "Push rejected, rebasing on origin/$BRANCH."
+            git pull --rebase --autostash origin "$BRANCH" || break
+            sleep $((RANDOM % 5 + 2))
+          done
+          echo "Push failed after retries." >&2
+          exit 1
+
+      # Surface a failed upstream *after* the good data is safely committed, so
+      # the run still goes red in the Actions tab.
+      - name: Report source failures
+        if: always()
+        run: |
+          # Plain ifs, not `[ ... ] && ...`: steps run under `bash -e`, where a
+          # false test as the last command of an && list aborts the step.
+          failed=""
+          if [ "${{ steps.tickers.outcome }}"  = "failure" ]; then failed="$failed build-tickers.js"; fi
+          if [ "${{ steps.insiders.outcome }}" = "failure" ]; then failed="$failed build-insiders.mjs"; fi
+          if [ "${{ steps.congress.outcome }}" = "failure" ]; then failed="$failed build-congress.mjs"; fi
+          if [ "${{ steps.fred.outcome }}"     = "failure" ]; then failed="$failed build-fred.mjs"; fi
+          if [ -n "$failed" ]; then
+            echo "Failed sources:$failed" >&2
+            exit 1
+          fi
+          echo "All sources refreshed."

@@ -1,8 +1,8 @@
-# Elysium Capital
+# Elysium
 
 **Independent Macro Research & Market Intelligence**
 
-Elysium Capital is a self-directed research platform focused on analyzing macroeconomic regimes, cross-asset relationships, and structural market forces. The project aims to translate complex economic data into clear, actionable insights for traders and investors.
+Elysium is a self-directed research platform focused on analyzing macroeconomic regimes, cross-asset relationships, and structural market forces. The project aims to translate complex economic data into clear, actionable insights for traders and investors.
 
 ---
 
@@ -75,5 +75,5 @@ For inquiries or collaboration:
 
 ---
 
-**Elysium Capital**
+**Elysium**
 Independent Macro Research

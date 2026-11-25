@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   scoreVixLevel, scoreTermStructure, scorePutCall,
-  composite, bandLabel, bandColor, matrixDotPosition,
+  composite, bandLabel, bandColor, bandKey, matrixDotPosition,
 } from '../macro.js';
 
 test('scoreVixLevel clamps between thresholds', () => {
@@ -39,6 +39,9 @@ test('bandLabel + bandColor bands', () => {
   assert.equal(bandLabel(50), 'Neutral');
   assert.equal(bandLabel(65), 'Greed');
   assert.equal(bandLabel(90), 'Complacency');
+  assert.equal(bandKey(10), 'bear');
+  assert.equal(bandKey(50), 'neutral');
+  assert.equal(bandKey(90), 'bull');
   assert.equal(bandColor(10), '#f87171');
   assert.equal(bandColor(50), '#facc15');
   assert.equal(bandColor(90), '#4ade80');

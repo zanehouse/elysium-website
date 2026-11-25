@@ -1,6 +1,6 @@
 ---
 title: "Micron Technology"
-subtitle: "Memory Supercycle — HBM & AI Data Center Demand"
+subtitle: "Memory Supercycle · HBM & AI Data Center Demand"
 ticker: "MU"
 exchange: "NASDAQ"
 rating: "BULLISH"
@@ -12,7 +12,7 @@ summary: "Micron is riding a cyclical memory upswing driven by hyperscale cloud 
 disclaimer: "This document is for informational and educational purposes only and does not constitute financial, investment, tax, or legal advice. Readers should conduct their own research and consult a qualified financial advisor before making investment decisions. Not for distribution."
 keyfacts:
   - label: "Ticker"
-    value: "MU — NASDAQ"
+    value: "MU · NASDAQ"
   - label: "Rating"
     value: "BULLISH"
   - label: "Price"

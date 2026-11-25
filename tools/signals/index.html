@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="robots" content="noindex" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart-Money Signals &ndash; Elysium Tools</title>
+  <!-- EMBED:START -->
+  <meta name="description" content="A per-ticker smart-money composite: insider buying (SEC Form 4), options positioning, and dealer gamma regime, fused into one score and radar. Free, no signup." />
+  <meta property="og:site_name" content="Elysium" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Smart-Money Signals – Elysium Tools" />
+  <meta property="og:description" content="Insider buying, options positioning, and dealer gamma regime fused into one per-ticker score and radar." />
+  <meta property="og:url" content="https://elysiumlab.markets/tools/signals/" />
+  <meta property="og:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Smart-Money Signals – Elysium Tools" />
+  <meta name="twitter:description" content="A per-ticker smart-money composite from insiders, options positioning, and gamma regime." />
+  <meta name="twitter:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
+  <meta name="theme-color" content="#D4D4D4" />
+  <!-- EMBED:END -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+
+  <header>
+    <div class="nav-inner">
+      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium"></a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="/home/">Home</a>
+        <a href="/research/">Research</a>
+        <a href="/framework/">Framework</a>
+        <a href="/tools/">Tools</a>
+        <a href="/links/">Links</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <noscript>
+      <style>.reveal{opacity:1!important;transform:none!important;transition:none!important}</style>
+      <p style="padding:3rem 0;color:#f87171">This tool requires JavaScript.</p>
+    </noscript>
+
+    <nav class="breadcrumb reveal" aria-label="Breadcrumb">
+      <a href="/home/">Home</a>
+      <span class="breadcrumb-sep">/</span>
+      <a href="/tools/">Tools</a>
+      <span class="breadcrumb-sep">/</span>
+      <span aria-current="page">Smart-Money Signals</span>
+    </nav>
+
+    <div class="page-hero reveal">
+      <h1>Smart-Money Signals</h1>
+      <p>One composite read on where informed money is leaning for a single name, built from insider buying, options positioning, and the dealer gamma regime. Every input comes from data already published on this site.</p>
+    </div>
+
+    <div class="tool-controls reveal">
+      <span class="tool-controls-label">Ticker</span>
+      <span id="preset-btns"></span>
+      <input id="ticker-input" class="tool-input" type="text" placeholder="Ticker" maxlength="8"
+        autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Ticker" />
+      <button id="load-btn" class="tool-btn">Score</button>
+    </div>
+
+    <div id="status" class="tool-status" hidden></div>
+
+    <section id="results" class="tool-hidden">
+      <p id="company" class="tool-selection-summary"></p>
+
+      <div class="tool-sentiment-row tool-signals-row">
+        <div class="tool-signals-radar">
+          <canvas id="radar-chart"></canvas>
+        </div>
+        <div class="tool-stats" id="composite"></div>
+      </div>
+
+      <p class="tool-subhead">Component Breakdown</p>
+      <div class="tool-stats" id="breakdown"></div>
+
+      <p id="updated" class="tool-updated"></p>
+    </section>
+
+    <p class="tool-subhead">Recent Congressional Filings</p>
+    <p class="tool-updated" style="margin-top:.5rem">Market-wide House Periodic Transaction Reports. These are shown as context rather than scored per ticker, since the House publishes no machine-readable ticker or amount, only the linked PDF. The <a href="/tools/insiders/">Insider Trades</a> tool carries the full feed.</p>
+    <ul class="tool-pulse" id="congress-pulse"></ul>
+    <p id="congress-updated" class="tool-updated"></p>
+
+    <p class="tool-note">
+      <b>Smart-Money Composite</b> runs 0 for strongly bearish to 100 for strongly bullish, taken as the mean of
+      whichever component scores are available below. <b>Insider Buying</b> is net dollar value bought against
+      sold in SEC Form 4 filings over roughly the last 180 days, counting open-market and disposition
+      transactions that carry a stated value and ignoring option exercises priced at $0. It is available only for
+      the fully-parsed names highlighted above. <b>Options Positioning</b> maps the near-the-money put/call
+      open-interest ratio to a bullish or bearish score, where heavier call interest reads bullish, using the same
+      scale as the Macro dashboard's put/call sentiment. <b>Gamma Regime</b> reads net dealer gamma off the same
+      option chain as the <a href="/tools/gex/">GEX</a> tool: net-positive gamma means dealers are long and is
+      treated as stabilizing, which scores higher, while net-negative gamma is amplifying and scores lower.
+      Any component without enough data behind it shows as "—" and drops out of the composite rather than getting
+      guessed at. Options coverage spans roughly 60 large caps, and full insider detail covers the highlighted
+      names. Data is delayed and published for informational and educational purposes only.
+      Not investment advice.
+    </p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img class="footer-logo" src="/assets/logo.png" alt="Elysium" />
+          <p class="footer-tagline">Independent macro research</p>
+          <p class="footer-disclaimer">
+            Content published by Elysium is for informational and educational purposes only and does
+            not constitute financial, investment, tax, or legal advice, nor an offer or solicitation to buy
+            or sell any security.
+          </p>
+        </div>
+        <nav class="footer-col" aria-label="Footer">
+          <span class="footer-col-heading">Site</span>
+          <a class="footer-link" href="/home/">Home</a>
+          <a class="footer-link" href="/research/">Research</a>
+          <a class="footer-link" href="/framework/">Framework</a>
+          <a class="footer-link" href="/tools/">Tools</a>
+          <a class="footer-link" href="/links/">Links</a>
+        </nav>
+        <div class="footer-col">
+          <span class="footer-col-heading">Connect</span>
+          <a class="footer-link" href="https://x.com/elysiumfirm" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+          <a class="footer-link" href="https://www.instagram.com/elysiumfirm/" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a class="footer-link" href="mailto:research@elysiumlab.markets">Email</a>
+          <a class="footer-link" href="https://discord.gg/scale" target="_blank" rel="noopener noreferrer">Discord</a>
+        </div>
+        <nav class="footer-col" aria-label="Legal">
+          <span class="footer-col-heading">Legal</span>
+          <a class="footer-link" href="/privacy/">Privacy</a>
+          <a class="footer-link" href="/terms/">Terms</a>
+          <a class="footer-link" href="/disclaimer/">Disclaimer</a>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium. All rights reserved.</span>
+        <span class="footer-copy">Not investment advice<span class="sep"></span>Not for distribution</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js" defer></script>
+  <script src="/js/script.js"></script>
+  <script src="/js/load.js" defer></script>
+  <script type="module" src="/js/tools/signals-page.js"></script>
+
+</body>
+
+</html>

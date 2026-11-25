@@ -11,7 +11,8 @@
 //         snapshot for the tool's Intraday/EOD close toggle) instead of
 //         assets/data/gex/, and skips the macro/sentiment rebuild.
 
-import { writeFile, mkdir, readFile } from 'node:fs/promises';
+import { mkdir, readFile, stat } from 'node:fs/promises';
+import { writeIfChanged } from './scripts/write-if-changed.mjs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -49,7 +50,13 @@ const GEX_SYMBOLS = [
   'PLTR', 'COIN', 'MSTR', 'HOOD', 'SOFI', 'RIVN', 'SNAP', 'DKNG', 'GME', 'AMC',
 ];
 
-const COMMIT_STRIKE_PCT = 0.15; // commit a slightly wider window than the browser uses (0.12)
+// Wide enough to also cover the vol surface's wings (js/tools/vol.js only
+// ever reads OTM quotes within whatever window is committed here, and never
+// extrapolates past it) — the browser's own GEX selection still filters
+// down to its fixed DEFAULTS.strikePct (0.12) regardless of how wide this
+// is, so widening it does not change any committed GEX number, only the
+// vol surface's strike coverage and the committed file size.
+const COMMIT_STRIKE_PCT = 0.25;
 
 function todayUTC() {
   return new Date().toISOString().slice(0, 10);
@@ -65,6 +72,12 @@ function asofDate(asof) {
 // Reduce a parsed chain to the committed GEX file shape. Keeps every expiry
 // (including LEAPS) — the dropdown lets the browser filter down; auto-select
 // still highlights the "contracts that matter" by default.
+//
+// `iv` rides along for the volatility surface tool (js/tools/vol.js) at 4dp —
+// 0.01 vol-point resolution, finer than any real bid/ask implies. The key is
+// omitted when CBOE has no usable quote, so contracts predating this field
+// and contracts with no quote look identical to the browser (both `c.iv`
+// undefined), which is exactly the degradation behaviour the vol page wants.
 function reduceChain(symbol, parsed) {
   const { spot, asof, contracts } = parsed;
   if (!spot || !contracts.length) throw new Error(`empty chain for ${symbol}`);
@@ -78,6 +91,7 @@ function reduceChain(symbol, parsed) {
     .map((c) => ({
       e: c.expiry, t: c.type, k: c.strike, oi: c.oi,
       g: Number(c.gamma.toFixed(6)), v: c.volume || 0,
+      ...(Number.isFinite(c.iv) ? { iv: Number(c.iv.toFixed(4)) } : {}),
     }));
   return {
     symbol: displaySymbol(symbol), spot: Number(spot.toFixed(2)), asof, today,
@@ -157,7 +171,7 @@ async function buildMacro({ vix, vix3m }, spyContracts, spyToday) {
   ];
 
   const out = { generated: new Date().toISOString(), composite: comp, label: bandLabel(comp), components };
-  await writeFile(path.join(DATA_DIR, 'macro.json'), JSON.stringify(out, null, 2));
+  await writeIfChanged(path.join(DATA_DIR, 'macro.json'), out, { pretty: true });
   return out;
 }
 
@@ -197,9 +211,9 @@ async function main() {
       const parsed = parseChain(raw);
       if (displaySymbol(sym) === 'SPY') { spyContracts = parsed.contracts; spyToday = asofDate(parsed.asof); }
       const out = reduceChain(sym, parsed);
-      await writeFile(path.join(outDir, `${out.symbol}.json`), JSON.stringify(out));
+      const wrote = await writeIfChanged(path.join(outDir, `${out.symbol}.json`), out);
       ok.push({ symbol: out.symbol, spot: out.spot, contracts: out.contracts.length });
-      console.log(`  ${out.symbol.padEnd(6)} spot=${out.spot}  contracts=${out.contracts.length}`);
+      console.log(`  ${out.symbol.padEnd(6)} spot=${out.spot}  contracts=${out.contracts.length}${wrote ? '' : '  (unchanged)'}`);
     } catch (err) {
       console.error(`  ${displaySymbol(sym).padEnd(6)} FAILED: ${err.message}`);
     }
@@ -221,14 +235,72 @@ async function main() {
   }
 
   const prev = await readManifest();
+
+  // Coverage (manifest.gex) is what every page gates on — GEX presets, Signals,
+  // the Volatility Surface. A symbol missing from it gets pushed down the slow
+  // live-proxy path even when its file is sitting right there on disk, so
+  // dropping an entry is expensive and dropping one by accident is worse.
+  //
+  // A SUBSET run (`node build-market-data.mjs SPY AAPL`, the local-debugging
+  // shape) must merge: replacing would shrink coverage to the two symbols just
+  // fetched.
+  //
+  // A FULL run is allowed to prune — that is how a symbol removed from
+  // GEX_SYMBOLS ever leaves the manifest — but it must not prune on a transient
+  // failure. A 64-symbol run against CBOE reliably 429s a few names at the tail
+  // even with the retry/backoff above, and naively writing "the symbols that
+  // succeeded" would silently evict every one of them. So a full run keeps any
+  // previous entry whose data file still exists on disk, and only drops symbols
+  // that are genuinely gone.
+  const isSubset = symbols.length > 0;
+
+  async function stillOnDisk(sym) {
+    try {
+      await stat(path.join(outDir, `${sym}.json`));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async function mergeCoverage(prevList, freshList) {
+    const keep = new Set(freshList);
+    for (const sym of prevList || []) {
+      if (keep.has(sym)) continue;
+      // Subset runs keep everything they didn't touch; full runs keep only what
+      // is still on disk.
+      if (isSubset || await stillOnDisk(sym)) keep.add(sym);
+    }
+    return [...keep].sort();
+  }
+
+  const freshSymbols = ok.map((s) => s.symbol);
+  const coverage = await mergeCoverage(isEod ? prev.gexEod : prev.gex, freshSymbols);
+
+  // `symbols` carries per-symbol spot/contract counts. Keep it in step with
+  // `coverage` — a fresh entry wins, a retained one survives, and anything
+  // pruned from coverage goes here too.
+  const covered = new Set(coverage);
+  const detail = [...new Map([...(prev.symbols || []), ...ok].map((s) => [s.symbol, s])).values()]
+    .filter((s) => covered.has(s.symbol));
+
   const manifest = {
     ...prev,
     generated: new Date().toISOString(),
     ...(isEod
-      ? { gexEod: ok.map((s) => s.symbol), eodGenerated: new Date().toISOString() }
-      : { gex: ok.map((s) => s.symbol), symbols: ok, macro: macro ? { composite: macro.composite, label: macro.label } : null }),
+      ? { gexEod: coverage, eodGenerated: new Date().toISOString() }
+      : {
+        gex: coverage,
+        symbols: detail,
+        macro: macro ? { composite: macro.composite, label: macro.label } : (prev.macro ?? null),
+      }),
   };
-  await writeFile(path.join(DATA_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2));
+  // Both clock fields are ignored here, so a run where no chain moved leaves the
+  // manifest untouched too — which is what keeps a quiet day at zero commits.
+  await writeIfChanged(path.join(DATA_DIR, 'manifest.json'), manifest, {
+    ignoreKeys: ['generated', 'eodGenerated'],
+    pretty: true,
+  });
   console.log(`Wrote ${ok.length}/${useSymbols.length} ${isEod ? 'EOD ' : ''}GEX files${isEod ? '' : ' + macro'} + manifest.`);
 }
 

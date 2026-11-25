@@ -9,12 +9,12 @@ export class FetchError extends Error {
   }
 }
 
-export async function fetchJSON(url, { timeoutMs = 30000, headers } = {}) {
+export async function fetchJSON(url, { timeoutMs = 30000, headers, cache } = {}) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   let res;
   try {
-    res = await fetch(url, { signal: ctrl.signal, headers });
+    res = await fetch(url, { signal: ctrl.signal, headers, ...(cache ? { cache } : {}) });
   } catch (err) {
     clearTimeout(timer);
     if (err && err.name === 'AbortError') throw new FetchError('timeout', `Request timed out (${url})`);
@@ -24,6 +24,132 @@ export async function fetchJSON(url, { timeoutMs = 30000, headers } = {}) {
   clearTimeout(timer);
   if (!res.ok) throw new FetchError('http', `HTTP ${res.status} (${url})`, res.status);
   return res.json();
+}
+
+// ── Data freshness ──────────────────────────────────────────────────────────
+// GitHub Pages serves every file with a fixed `cache-control: max-age=600` and
+// there is no way to override it, so a visitor could see JSON up to ten minutes
+// staler than what the refresh job had already committed.
+//
+// The fix is to make the URL change whenever the data changes. manifest.json is
+// small and is fetched `no-store`, so it's always current; its `generated`
+// stamp then versions every other data URL. Unchanged data keeps caching
+// normally — and since the build scripts now skip writing unchanged payloads,
+// `generated` only moves when the numbers actually moved.
+
+let _manifestPromise = null;
+
+// Memoised for the page's lifetime. Rejections aren't cached, so a failed load
+// doesn't poison later callers.
+export function loadManifest() {
+  if (!_manifestPromise) {
+    _manifestPromise = fetchJSON('/assets/data/manifest.json', { timeoutMs: 8000, cache: 'no-store' });
+    _manifestPromise.catch(() => { _manifestPromise = null; });
+  }
+  return _manifestPromise;
+}
+
+let _version;
+async function dataVersion() {
+  if (_version !== undefined) return _version;
+  try {
+    _version = (await loadManifest()).generated || '';
+  } catch {
+    _version = '';   // manifest unreachable: fall back to an unversioned URL
+  }
+  return _version;
+}
+
+// Fetch a file under assets/data/ with a cache-busting version token.
+export async function fetchData(path, opts) {
+  const v = await dataVersion();
+  return fetchJSON(v ? `${path}?v=${encodeURIComponent(v)}` : path, opts);
+}
+
+// ── Live freshness ───────────────────────────────────────────────────────────
+// Every tool page today loads its data once and never checks again — an open
+// tab can sit on a stale snapshot indefinitely even after the prefetch
+// pipeline has committed something newer. watchManifest() polls the same
+// manifest.json the cache-busting above already reads, and calls back only
+// when `generated` actually moves past what the caller already has, so a
+// page can silently pick up new data without a manual reload.
+//
+// Pauses while the tab is hidden (Page Visibility API) rather than burning
+// fetches nobody can see, and checks immediately on refocus instead of
+// resuming whatever was left of a stale interval — the visible effect is
+// that returning to a backgrounded tab feels current right away, not up to
+// intervalMs stale.
+export function watchManifest(sinceGenerated, onChange, opts = {}) {
+  const {
+    intervalMs = 60000,
+    path = '/assets/data/manifest.json',
+    fetchImpl = typeof fetch === 'function' ? fetch : undefined,
+  } = opts;
+
+  let current = sinceGenerated;
+  let timer = null;
+  let stopped = false;
+  const hasDoc = typeof document !== 'undefined';
+
+  async function check() {
+    if (stopped || !fetchImpl) return;
+    try {
+      const res = await fetchImpl(path, { cache: 'no-store' });
+      if (!res.ok) return;
+      const manifest = await res.json();
+      if (manifest && manifest.generated && manifest.generated !== current) {
+        current = manifest.generated;
+        onChange(manifest);
+      }
+    } catch {
+      // Best-effort — the next tick tries again. A background poll failing
+      // silently is the correct behaviour here; the caller keeps showing
+      // whatever it already loaded and nothing about that is wrong yet.
+    }
+  }
+
+  function schedule() {
+    if (stopped) return;
+    timer = setTimeout(() => { check().then(schedule); }, intervalMs);
+  }
+
+  function onVisibility() {
+    if (!hasDoc) return;
+    if (document.hidden) {
+      if (timer) { clearTimeout(timer); timer = null; }
+    } else {
+      if (timer) { clearTimeout(timer); timer = null; }
+      check().then(schedule);
+    }
+  }
+
+  if (hasDoc) document.addEventListener('visibilitychange', onVisibility);
+  if (!hasDoc || !document.hidden) schedule();
+
+  return {
+    stop() {
+      stopped = true;
+      if (timer) { clearTimeout(timer); timer = null; }
+      if (hasDoc) document.removeEventListener('visibilitychange', onVisibility);
+    },
+  };
+}
+
+// Live "Xs ago" / "Xm ago" ticker, the same Date.now()-diffing shape as
+// setLoading()'s elapsed counter below but on its own interval handle, so it
+// can run for the page's whole lifetime concurrently with (short-lived)
+// loading-state timers without the two fighting over one handle. Rounds DOWN
+// — "how long ago, at minimum" reads honestly; rounding to nearest would
+// occasionally claim data is fresher than it is.
+export function startFreshnessTicker(el, sinceMs) {
+  if (!el) return () => {};
+  const render = () => {
+    const secs = Math.max(0, Math.floor((Date.now() - sinceMs) / 1000));
+    el.textContent = secs < 60 ? `${secs}s ago` : `${Math.floor(secs / 60)}m ago`;
+  };
+  render();
+  const timer = setInterval(render, 1000);
+  return () => clearInterval(timer);
 }
 
 // ── Status line ─────────────────────────────────────────────────────────────
@@ -98,3 +224,6 @@ export function fmtTimestamp(ts) {
 }
 
 export function qs(sel, root = document) { return root.querySelector(sel); }
+
+// Divider between inline items in generated HTML (.sep in style.css); never a middle dot.
+export const SEP = '<span class="sep"></span>';

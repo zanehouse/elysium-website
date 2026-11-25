@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="robots" content="noindex" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Volatility Surface &amp; Skew &ndash; Elysium Tools</title>
+  <!-- EMBED:START -->
+  <meta name="description" content="The implied volatility smile by expiration and the at-the-money term structure for any optionable ticker. Standard-deviation-normalized skew and a 30-day ATM reading. Free, CBOE-delayed data." />
+  <meta property="og:site_name" content="Elysium" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Volatility Surface &amp; Skew – Elysium Tools" />
+  <meta property="og:description" content="The implied volatility smile by expiration and the at-the-money term structure for any optionable ticker. Standard-deviation-normalized skew and a 30-day ATM reading." />
+  <meta property="og:url" content="https://elysiumlab.markets/tools/vol/" />
+  <meta property="og:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Volatility Surface &amp; Skew – Elysium Tools" />
+  <meta name="twitter:description" content="The implied volatility smile by expiration and the ATM term structure for any optionable ticker." />
+  <meta name="twitter:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
+  <meta name="theme-color" content="#D4D4D4" />
+  <!-- EMBED:END -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+
+  <!-- three, for the 3D surface only. One importmap per document, and it has to
+       precede both the first module script and the first modulepreload. The
+       surface is dynamically imported inside a try/catch, so if any of this
+       fails to resolve the 2D charts below are untouched. -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.min.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+      }
+    }
+  </script>
+  <!-- Both files, or three.core resolves in a second serial round-trip.
+       crossorigin is required: module scripts always fetch in CORS mode. -->
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.min.js" crossorigin />
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.core.min.js" crossorigin />
+</head>
+
+<body>
+
+  <header>
+    <div class="nav-inner">
+      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium"></a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="/home/">Home</a>
+        <a href="/research/">Research</a>
+        <a href="/framework/">Framework</a>
+        <a href="/tools/">Tools</a>
+        <a href="/links/">Links</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <noscript>
+      <style>.reveal{opacity:1!important;transform:none!important;transition:none!important}</style>
+      <p style="padding:3rem 0;color:#f87171">This tool requires JavaScript.</p>
+    </noscript>
+
+    <nav class="breadcrumb reveal" aria-label="Breadcrumb">
+      <a href="/home/">Home</a>
+      <span class="breadcrumb-sep">/</span>
+      <a href="/tools/">Tools</a>
+      <span class="breadcrumb-sep">/</span>
+      <span aria-current="page">Volatility Surface</span>
+    </nav>
+
+    <div class="page-hero reveal">
+      <h1>Volatility Surface &amp; Skew</h1>
+      <p>What the options market is charging for risk, by strike and by expiration. The smile shows how implied volatility shifts across strikes, while the term structure shows how the at-the-money level shifts with time. Any optionable ticker is searchable; prefetched symbols load instantly, and anything else is looked up live.</p>
+    </div>
+
+    <div class="tool-controls reveal">
+      <span class="tool-controls-label">Symbol</span>
+      <span id="preset-btns"></span>
+      <input id="symbol-input" class="tool-input" type="text" placeholder="Any ticker…" maxlength="8"
+        autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Symbol"
+        list="vol-symbol-list" />
+      <datalist id="vol-symbol-list"></datalist>
+      <button id="load-btn" class="tool-btn">Load</button>
+    </div>
+
+    <div id="status" class="tool-status" hidden></div>
+
+    <section id="results" class="tool-hidden">
+      <div class="tool-stats" id="stats"></div>
+
+      <div class="tool-filter-bar">
+        <span class="tool-filter-label">Expirations</span>
+        <span id="expiry-chips" class="tool-chips"></span>
+      </div>
+
+      <div class="tool-filter-bar">
+        <span class="tool-filter-label">X axis</span>
+        <span id="xaxis-toggle" class="tool-toggle-group"></span>
+        <span class="tool-filter-count" id="selection-summary"></span>
+      </div>
+
+      <section id="surface-section" class="tool-surface-section">
+        <div class="tool-surface-head">
+          <span class="tool-chart-title">The Surface</span>
+          <span class="tool-surface-controls">
+            <span class="tool-surface-hint" id="surface-hint">Drag to orbit, scroll to zoom</span>
+            <button id="surface-spin" class="tool-chip">Spin</button>
+            <button id="surface-reset" class="tool-chip">Reset view</button>
+          </span>
+        </div>
+
+        <div class="tool-surface-wrap" id="surface-wrap">
+          <canvas id="surface-canvas"></canvas>
+          <div class="tool-surface-tip" id="surface-tip" hidden></div>
+          <div class="tool-surface-legend" id="surface-legend" hidden>
+            <span class="tool-surface-legend-label" id="legend-lo">—</span>
+            <span class="tool-surface-legend-bar" id="legend-bar">
+              <span class="tool-surface-legend-ticks" id="legend-ticks"></span>
+            </span>
+            <span class="tool-surface-legend-label" id="legend-hi">—</span>
+          </div>
+        </div>
+        <p class="tool-surface-note" id="surface-note"></p>
+      </section>
+
+      <div class="tool-chart-row">
+        <div>
+          <span class="tool-chart-title">Implied Volatility Smile</span>
+          <div class="tool-chart-wrap">
+            <canvas id="smile-chart"></canvas>
+          </div>
+        </div>
+        <div>
+          <span class="tool-chart-title">ATM Term Structure</span>
+          <div class="tool-chart-wrap">
+            <canvas id="term-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <p id="updated" class="tool-updated"></p>
+      <p class="tool-updated tool-updated-disclosure">
+        CBOE quotes are about 15 minutes delayed at the source; this page checks for a refreshed chain roughly
+        every 15 minutes during market hours.
+      </p>
+    </section>
+
+    <p class="tool-note">
+      <b>How the smile is built:</b> from <b>out-of-the-money quotes only</b>. In-the-money options barely trade,
+      so their quotes come back wide and stale. On a live chain the in-the-money contracts routinely print
+      5&ndash;10 volatility points away from the at-the-money level, and nearly all of that gap is microstructure
+      rather than signal. Restricting to out-of-the-money quotes costs nothing, since every strike still
+      contributes exactly one quote: the liquid one. Out-of-the-money is split at <b>spot</b> rather than at the
+      forward, because the chain carries no rate or dividend. Inside 60 days the forward sits within a few basis
+      points of spot, so at most a strike or two right at the money ends up classified the other way.
+      <b>Same-day expirations are excluded entirely.</b> Expiring implied volatility is a rounding artifact of
+      near-zero time value rather than a real volatility reading; five adjacent 0DTE strikes on a live SPX chain
+      printed 0.82, 1.34, 2.11, 4.90 and 8.43.
+      <br><br>
+      <b>The two skew readings.</b> The headline <b>skew slope</b> is a least-squares fit of implied volatility
+      against moneyness measured in <i>expected standard deviations</i>, <code>z = ln(K/S) ÷ (ATM × √T)</code>.
+      That normalization matters. A fixed &plusmn;10% skew reading decays at roughly 1/&radic;T purely as an
+      artifact of scale; on a live AAPL chain it fell from 16.7 volatility points at 1 day to 5.3 at 50 days, not
+      because skew changed, though because 10% is several standard deviations next week and under one standard
+      deviation two months out. The slope strips that artifact away, leaving a number comparable across
+      expirations and across tickers. A negative slope is the normal equity shape, where downside strikes carry
+      higher volatility. The <b>R&sup2;</b> beside it says how well a straight line describes the smile at all,
+      and front-week smiles are steep V shapes that fit poorly, which is worth seeing on its own. The secondary
+      <b>&plusmn;10% skew</b> is the raw fixed-moneyness reading, shown unnormalized and sometimes unavailable
+      when the open-interest floor has removed one wing. Both readings describe the expiration nearest 30 days
+      rather than the front, since a one-day smile is too noisy to anchor a headline number to.
+      <br><br>
+      <b>The 30-day ATM</b> is interpolated between the two bracketing expirations <b>linearly in total variance</b>
+      (&sigma;&sup2;T), the same convention VIX uses, then converted back into a volatility; interpolating
+      volatility directly misprices the middle of a steep curve. Nothing here is ever extrapolated. A reading
+      outside the listed range is labelled <i>nearest listed</i>, and an implied volatility outside the covered
+      strike range is not shown at all, because the committed chains hold strikes within &plusmn;25% of spot and
+      inventing the wings would mean inventing exactly the data that window removed.
+      <br><br>
+      <b>The 3D surface fills gaps in time, and only in time.</b> The open-interest floor deletes one thin wing
+      on some weekly expirations, which would otherwise leave the surface visibly torn. Where a moneyness has a
+      real quote at an expiration both <i>before</i> and <i>after</i> the gap, the surface interpolates between
+      the two in total variance, the same arithmetic as the 30-day reading above, and never past either end.
+      In the moneyness direction nothing is filled at all. A ragged edge is a strike the board does not list, and
+      it stays ragged on purpose. The caption under the surface reports the measured before-and-after coverage
+      for the symbol currently loaded, and hover always returns a real listed expiration rather than an
+      interpolated tenor. There is one real cost to this approach: interpolating across two expirations that
+      straddle an <b>earnings date</b> smooths over a discontinuity that genuinely exists, so the days on either
+      side of a report read more gently on the surface than they do on the board.
+      <br><br>
+      Prefetched symbols cover roughly 60 liquid indices, ETFs and megacaps; they load instantly and refresh
+      every 15 minutes, though they are filtered to that &plusmn;25% strike window above a per-symbol
+      open-interest floor. Any other ticker is looked up live by racing several public CORS proxies, since
+      CBOE's chain endpoint isn't reachable from a browser directly. That path is best-effort and can run slow,
+      though it returns the <i>full unfiltered board</i>, so its wings and thin weeklies are better than what the
+      prefetched feed carries.
+      The same chains feed two other tools: <a href="/tools/gex/">Gamma Exposure</a> reads dealer positioning off
+      this board, and the <a href="/tools/greeks/">Options Greeks Lab</a> will price a contract at any volatility
+      shown here. Data: CBOE 15-minute delayed. Not investment advice.
+    </p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img class="footer-logo" src="/assets/logo.png" alt="Elysium" />
+          <p class="footer-tagline">Independent macro research</p>
+          <p class="footer-disclaimer">
+            Content published by Elysium is for informational and educational purposes only and does
+            not constitute financial, investment, tax, or legal advice, nor an offer or solicitation to buy
+            or sell any security.
+          </p>
+        </div>
+        <nav class="footer-col" aria-label="Footer">
+          <span class="footer-col-heading">Site</span>
+          <a class="footer-link" href="/home/">Home</a>
+          <a class="footer-link" href="/research/">Research</a>
+          <a class="footer-link" href="/framework/">Framework</a>
+          <a class="footer-link" href="/tools/">Tools</a>
+          <a class="footer-link" href="/links/">Links</a>
+        </nav>
+        <div class="footer-col">
+          <span class="footer-col-heading">Connect</span>
+          <a class="footer-link" href="https://x.com/elysiumfirm" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+          <a class="footer-link" href="https://www.instagram.com/elysiumfirm/" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a class="footer-link" href="mailto:research@elysiumlab.markets">Email</a>
+          <a class="footer-link" href="https://discord.gg/scale" target="_blank" rel="noopener noreferrer">Discord</a>
+        </div>
+        <nav class="footer-col" aria-label="Legal">
+          <span class="footer-col-heading">Legal</span>
+          <a class="footer-link" href="/privacy/">Privacy</a>
+          <a class="footer-link" href="/terms/">Terms</a>
+          <a class="footer-link" href="/disclaimer/">Disclaimer</a>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium. All rights reserved.</span>
+        <span class="footer-copy">Not investment advice<span class="sep"></span>Not for distribution</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js" defer></script>
+  <script src="/js/script.js"></script>
+  <script src="/js/load.js" defer></script>
+  <script type="module" src="/js/tools/vol-page.js"></script>
+
+</body>
+
+</html>

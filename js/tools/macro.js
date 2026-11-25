@@ -47,12 +47,21 @@ export function bandLabel(score) {
   return 'Complacency';
 }
 
+// Sentiment band → 'bear' | 'neutral' | 'bull', matching the CSS --bull/--neutral/--bear tokens.
+export function bandKey(score) {
+  if (!Number.isFinite(score)) return null;
+  if (score < 45) return 'bear';
+  if (score <= 55) return 'neutral';
+  return 'bull';
+}
+
 // Sentiment band → palette color (fear = red, neutral = yellow, greed = green).
 export function bandColor(score) {
-  if (!Number.isFinite(score)) return '#888888';
-  if (score < 45) return '#f87171';
-  if (score <= 55) return '#facc15';
-  return '#4ade80';
+  const key = bandKey(score);
+  if (key === 'bear') return '#f87171';
+  if (key === 'neutral') return '#facc15';
+  if (key === 'bull') return '#4ade80';
+  return '#888888';
 }
 
 // One-word read for a component score.

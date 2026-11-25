@@ -8,9 +8,10 @@
 //
 // Usage:  node build-insiders.mjs [SYM ...]
 
-import { writeFile, mkdir, readFile } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { writeIfChanged } from './scripts/write-if-changed.mjs';
 
 import { lookupCik, extractForm4Filings, rawXmlUrl, parseForm4Xml } from './js/tools/insiders.js';
 
@@ -18,7 +19,7 @@ const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(ROOT, 'assets', 'data');
 const OUT_DIR = path.join(DATA_DIR, 'insiders');
 
-const UA = 'Elysium Capital tools (research@elysiumlab.markets)';
+const UA = 'Elysium tools (research@elysiumlab.markets)';
 const FILINGS_PER_SYMBOL = 15;
 const REQ_DELAY_MS = 130; // stay well under SEC's 10 req/s
 
@@ -85,7 +86,7 @@ async function buildSymbol(symbol, map) {
   }
 
   const doc = { symbol, cik, name, generated: new Date().toISOString(), filings: out };
-  await writeFile(path.join(OUT_DIR, `${symbol}.json`), JSON.stringify(doc));
+  await writeIfChanged(path.join(OUT_DIR, `${symbol}.json`), doc);
   return { symbol, filings: out.length };
 }
 
@@ -103,8 +104,8 @@ async function main() {
       console.error(`  ${sym.padEnd(6)} FAILED: ${err.message}`);
     }
   }
-  await writeFile(path.join(DATA_DIR, 'insiders-manifest.json'),
-    JSON.stringify({ generated: new Date().toISOString(), symbols: ok }, null, 2));
+  await writeIfChanged(path.join(DATA_DIR, 'insiders-manifest.json'),
+    { generated: new Date().toISOString(), symbols: ok }, { pretty: true });
   console.log(`Wrote ${ok.length}/${symbols.length} insider files.`);
 }
 

@@ -10,7 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const UA = 'Elysium Capital tools (research@elysiumlab.markets)';
+const UA = 'Elysium tools (research@elysiumlab.markets)';
 const SRC = 'https://www.sec.gov/files/company_tickers.json';
 const OUT = path.resolve(__dirname, 'assets', 'data', 'ticker-cik.json');
 

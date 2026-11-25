@@ -11,7 +11,8 @@
     "data:congress": "node build-congress.mjs",
     "data:fred": "node build-fred.mjs",
     "data:tickers": "node build-tickers.js",
-    "test": "node --test \"js/tools/test/*.test.js\""
+    "preflight": "node scripts/preflight.mjs",
+    "test": "node scripts/preflight.mjs && node --test \"js/tools/test/*.test.js\""
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

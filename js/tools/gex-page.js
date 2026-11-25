@@ -4,7 +4,7 @@
 // SAME selection + aggregation as the pipeline (gex.js) so the expiration
 // dropdown and OI/Volume toggle are live.
 
-import { fetchJSON, setLoading, setError, setStatus, fmtSignedMoney, fmtStrike, fmtNum, fmtTimestamp, qs } from './common.js';
+import { fetchData, loadManifest, setLoading, setError, setStatus, fmtSignedMoney, fmtStrike, fmtNum, fmtTimestamp, qs, SEP } from './common.js';
 import { PALETTE, applyTheme, verticalLinePlugin } from './chart-theme.js';
 import { fetchChainViaProxy, parseChain, displaySymbol } from './cboe.js';
 import {
@@ -70,7 +70,7 @@ const PRESET_ROW = [
 async function buildPresets() {
   let symbols = FALLBACK_SYMBOLS;
   try {
-    const manifest = await fetchJSON('/assets/data/manifest.json', { timeoutMs: 8000 });
+    const manifest = await loadManifest();
     if (Array.isArray(manifest.gex) && manifest.gex.length) symbols = manifest.gex;
     if (Array.isArray(manifest.gexEod)) coveredEodSymbols = new Set(manifest.gexEod);
   } catch { /* fall back to the static list */ }
@@ -144,7 +144,7 @@ async function load(rawSymbol, { resetExpiry = true } = {}) {
   if (state.snapshot === 'eod') {
     setLoading(els.status, `Loading ${symbol} EOD close snapshot…`);
     try {
-      data = await fetchJSON(`/assets/data/gex-eod/${symbol}.json`, { timeoutMs: 15000 });
+      data = await fetchData(`/assets/data/gex-eod/${symbol}.json`, { timeoutMs: 15000 });
       data.contracts = data.contracts.map(expand);
     } catch (err) {
       setError(els.status, `Couldn't load ${symbol} EOD snapshot (${err.kind || 'error'}).`, () => load(symbol, { resetExpiry: false }));
@@ -153,7 +153,7 @@ async function load(rawSymbol, { resetExpiry = true } = {}) {
   } else if (coveredSymbols.has(symbol)) {
     setLoading(els.status, `Loading ${symbol} chain…`);
     try {
-      data = await fetchJSON(`/assets/data/gex/${symbol}.json`, { timeoutMs: 15000 });
+      data = await fetchData(`/assets/data/gex/${symbol}.json`, { timeoutMs: 15000 });
       data.contracts = data.contracts.map(expand);
     } catch (err) {
       setError(els.status, `Couldn't load ${symbol} (${err.kind || 'error'}).`, () => load(symbol));
@@ -194,8 +194,8 @@ async function load(rawSymbol, { resetExpiry = true } = {}) {
   updateWeightToggle();
   await recompute();
   const src = isLive ? 'live via public proxy' : (state.snapshot === 'eod' ? 'CBOE EOD snapshot' : 'CBOE delayed');
-  els.updated.textContent = `${src} · as of ${fmtTimestamp(data.asof)} · spot ${fmtStrike(data.spot)}` +
-    (fellBackFromEod ? ' · EOD snapshot unavailable for this symbol, showing intraday' : '');
+  els.updated.innerHTML = `${src}${SEP}as of ${fmtTimestamp(data.asof)}${SEP}spot ${fmtStrike(data.spot)}` +
+    (fellBackFromEod ? `${SEP}EOD snapshot unavailable for this symbol, showing intraday` : '');
 }
 
 // ── Expiration dropdown ─────────────────────────────────────────────────────
@@ -227,7 +227,7 @@ function renderExpirySelect() {
     }
     const o = document.createElement('option');
     o.value = e.date;
-    o.textContent = `${shortDate(e.date)} · ${e.dte}d${e.opex ? ' · OPEX' : ''}`;
+    o.textContent = `${shortDate(e.date)} (${e.dte}d${e.opex ? ', OPEX' : ''})`;
     group.appendChild(o);
   }
 
@@ -314,9 +314,9 @@ async function recompute() {
   const range = summary.strikeMin != null ? `${fmtStrike(summary.strikeMin)}–${fmtStrike(summary.strikeMax)}` : '—';
   const weightLabel = state.weightBy === 'volume' ? 'volume' : 'open interest';
   els.summary.innerHTML =
-    `Auto-selected <b>${summary.nSelected}</b> contracts · <b>${summary.nExpiries}</b> expiries · ` +
-    `strikes <b>${range}</b> · OI ≥ <b>${minOI}</b> · vol ≥ <b>${minVolume}</b> · ` +
-    `±${(strikePct * 100).toFixed(0)}% of spot · weighted by <b>${weightLabel}</b>`;
+    `Auto-selected <b>${summary.nSelected}</b> contracts${SEP}<b>${summary.nExpiries}</b> expiries${SEP}` +
+    `strikes <b>${range}</b>${SEP}OI ≥ <b>${minOI}</b>${SEP}vol ≥ <b>${minVolume}</b>${SEP}` +
+    `±${(strikePct * 100).toFixed(0)}% of spot${SEP}weighted by <b>${weightLabel}</b>`;
   renderStats(result, spot);
   await drawChart(result, spot);
 }

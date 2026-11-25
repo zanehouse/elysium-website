@@ -3,21 +3,31 @@ name: Refresh market data
 # Prefetches CBOE option chains + VIX levels and commits reduced JSON into
 # assets/data/ for the free-tools pages (CBOE serves no CORS header, so the
 # browser cannot fetch it directly). Runs on the default branch.
+#
+# Cadence is driven by scripts/session-refresh.sh, which stays alive for one
+# market session and refreshes on a real 15-minute timer. The previous
+# `*/15 13-20 * * 1-5` cron asked for 32 runs/day and GitHub reliably delivered
+# only ~6 of them, 90-106 minutes apart — schedule events are deprioritised
+# under load, and */15 lands on :00/:15/:30/:45, the worst minutes for it.
+# Two long jobs depend on two cron deliveries instead of thirty-two.
+#
+# Market hours are evaluated in America/New_York inside the loop, not encoded
+# in the cron's UTC hours, so DST needs no seasonal maintenance.
 
 on:
   workflow_dispatch:
     inputs:
       eod:
-        description: 'Write an EOD close snapshot instead of the intraday refresh'
+        description: 'Take a one-shot EOD close snapshot instead of running a session loop'
         type: boolean
         default: false
   schedule:
-    # Every 15 min during US market hours (≈9:30–16:00 ET → 13:30–20:00 UTC),
-    # Mon–Fri. GitHub cron is UTC; adjust ±1h across DST if you want tighter bounds.
-    - cron: '*/15 13-20 * * 1-5'
-    # Once after the close (≈16:15 ET → 20:15 UTC standard time / 21:15 UTC
-    # during DST) to freeze the EOD close snapshot for the Intraday/EOD toggle.
-    - cron: '15 21 * * 1-5'
+    # Offset off :00 — GitHub's schedule queue is most congested on the hour.
+    # Morning session, runs to 17:20 UTC (13:20 ET in EDT, 12:20 ET in EST).
+    - cron: '26 13 * * 1-5'
+    # Afternoon session, runs to 21:40 UTC — late enough to capture the EOD
+    # snapshot at 16:15 ET in both EDT (20:15 UTC) and EST (21:15 UTC).
+    - cron: '26 17 * * 1-5'
 
 # Allow the job to push the refreshed data back to the repo.
 permissions:
@@ -30,34 +40,55 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    # Longest session is 17:26->21:40 UTC (~4h15m); this leaves slack without
+    # letting a hung socket pin a runner for the default six hours.
+    timeout-minutes: 270
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The loop pushes repeatedly from one checkout and rebases on
+          # rejection, which needs real history rather than a depth-1 clone.
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      # No npm install needed — build-market-data.mjs uses only Node built-ins
-      # and the local js/tools ESM modules.
-      - name: Fetch + reduce market data
-        env:
-          IS_EOD_SCHEDULE: ${{ github.event.schedule == '15 21 * * 1-5' }}
-          IS_EOD_DISPATCH: ${{ github.event.inputs.eod }}
-        run: |
-          if [ "$IS_EOD_SCHEDULE" = "true" ] || [ "$IS_EOD_DISPATCH" = "true" ]; then
-            node build-market-data.mjs --eod
-          else
-            node build-market-data.mjs
-          fi
-
-      - name: Commit refreshed data
+      - name: Configure git identity
         run: |
           git config user.name "elysium-bot"
           git config user.email "actions@users.noreply.github.com"
+
+      # A manual EOD dispatch is a one-shot, not a session — take the snapshot
+      # and stop.
+      - name: One-shot EOD snapshot
+        if: ${{ github.event.inputs.eod == 'true' }}
+        run: |
+          node build-market-data.mjs --eod
           git add assets/data
           if git diff --cached --quiet; then
             echo "No data changes."
           else
-            git commit -m "chore(data): refresh market data [skip ci]"
+            git commit -m "chore(data): refresh EOD snapshot [skip ci]"
             git push
           fi
+
+      # No npm install needed — build-market-data.mjs uses only Node built-ins
+      # and the local js/tools ESM modules.
+      - name: Run session refresh loop
+        if: ${{ github.event.inputs.eod != 'true' }}
+        env:
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          # Pick the session from the wall clock rather than matching the cron
+          # string. The old `github.event.schedule == '15 21 * * 1-5'` check
+          # silently degraded into a second intraday run if the cron was ever
+          # reformatted, and this also does the right thing on manual dispatch.
+          start=$(date -u +%H%M)
+          if [ $((10#$start)) -lt 1530 ]; then
+            deadline=1720   # morning session
+          else
+            deadline=2140   # afternoon session, carries the EOD snapshot
+          fi
+          echo "Starting session at ${start}Z, deadline ${deadline}Z"
+          DEADLINE_UTC="$deadline" bash scripts/session-refresh.sh

@@ -9,7 +9,7 @@
 // is entirely prefetched (assets/data/congress.json) — the House publishes no
 // machine-readable transaction detail, only filing metadata + PDF links.
 
-import { fetchJSON, setLoading, setError, setStatus, fmtInt, fmtNum, fmtTimestamp, qs } from './common.js';
+import { fetchJSON, fetchData, setLoading, setError, setStatus, fmtInt, fmtNum, fmtTimestamp, qs, SEP } from './common.js';
 import { lookupCik, extractForm4Filings, edgarIndexUrl, codeLabel } from './insiders.js';
 
 const FALLBACK_PRESETS = ['AAPL', 'NVDA', 'TSLA', 'MSFT', 'META'];
@@ -30,7 +30,7 @@ function esc(s) {
 }
 
 async function getTickerMap() {
-  if (!tickerMap) tickerMap = await fetchJSON('/assets/data/ticker-cik.json', { timeoutMs: 15000 });
+  if (!tickerMap) tickerMap = await fetchData('/assets/data/ticker-cik.json', { timeoutMs: 15000 });
   return tickerMap;
 }
 
@@ -46,7 +46,7 @@ function switchTab(name) {
 async function buildPresets() {
   let symbols = FALLBACK_PRESETS;
   try {
-    const m = await fetchJSON('/assets/data/insiders-manifest.json', { timeoutMs: 8000 });
+    const m = await fetchData('/assets/data/insiders-manifest.json', { timeoutMs: 8000 });
     if (Array.isArray(m.symbols) && m.symbols.length) symbols = m.symbols;
   } catch { /* keep fallback */ }
   coveredSet = new Set(symbols);
@@ -72,7 +72,7 @@ async function loadCompany(rawTicker) {
 
   if (coveredSet.has(ticker)) {
     try {
-      const data = await fetchJSON(`/assets/data/insiders/${ticker}.json`, { timeoutMs: 12000 });
+      const data = await fetchData(`/assets/data/insiders/${ticker}.json`, { timeoutMs: 12000 });
       setStatus(els.status, 'idle');
       buildRichRows(data);
       return;
@@ -103,8 +103,8 @@ async function loadCompany(rawTicker) {
 // with no parsed transactions still get one metadata-only row).
 function buildRichRows(data) {
   company.mode = 'rich';
-  company.companyLine = `<b>${esc(data.name || data.symbol)}</b> · CIK ${esc(data.cik)}`;
-  company.updatedLine = `SEC EDGAR · parsed ${new Date(data.generated).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+  company.companyLine = `<b>${esc(data.name || data.symbol)}</b>${SEP}CIK ${esc(data.cik)}`;
+  company.updatedLine = `SEC EDGAR${SEP}parsed ${new Date(data.generated).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
   const rows = [];
   for (const f of (data.filings || [])) {
     const role = [...(f.roles || []), f.title].filter(Boolean).join(', ') || '—';
@@ -125,8 +125,8 @@ function buildRichRows(data) {
 
 function buildLiveRows(ticker, name, cik, filings) {
   company.mode = 'live';
-  company.companyLine = `<b>${esc(name || ticker)}</b> · CIK ${esc(cik)}`;
-  company.updatedLine = 'SEC EDGAR · live';
+  company.companyLine = `<b>${esc(name || ticker)}</b>${SEP}CIK ${esc(cik)}`;
+  company.updatedLine = `SEC EDGAR${SEP}live`;
   company.rows = (filings || []).map((f) => ({
     date: f.date, owner: null, role: null, side: null, code: f.form, shares: null, price: null, value: null,
     url: edgarIndexUrl(cik, f.accession),
@@ -176,7 +176,7 @@ function renderCompanyTable() {
         `<td>${price}</td><td>${value}</td><td><a href="${esc(r.url)}" target="_blank" rel="noopener">EDGAR →</a></td></tr>`;
     }).join('') || '<tr><td colspan="8">No recent Form 4 filings.</td></tr>';
   }
-  els.updated.textContent = company.updatedLine || '';
+  els.updated.innerHTML = company.updatedLine || '';
 }
 
 // ── Congress: load + filter + render ────────────────────────────────────────
@@ -184,14 +184,14 @@ async function loadCongress() {
   setLoading(els.congressStatus, 'Loading House financial disclosures…');
   els.congressResults.classList.add('tool-hidden');
   try {
-    const data = await fetchJSON('/assets/data/congress.json', { timeoutMs: 15000 });
+    const data = await fetchData('/assets/data/congress.json', { timeoutMs: 15000 });
     congress.rows = data.filings || [];
     congress.loaded = true;
     congress.generated = data.generated;
     setStatus(els.congressStatus, 'idle');
     els.congressResults.classList.remove('tool-hidden');
     renderCongressTable();
-    els.congressUpdated.textContent = `House Clerk · parsed ${fmtTimestamp(data.generated)}`;
+    els.congressUpdated.innerHTML = `House Clerk${SEP}parsed ${fmtTimestamp(data.generated)}`;
   } catch (err) {
     setError(els.congressStatus, `Couldn't load congressional filings (${err.kind || 'error'}).`, loadCongress);
   }

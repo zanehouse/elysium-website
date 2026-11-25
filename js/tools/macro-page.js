@@ -3,7 +3,7 @@
 // macro-fred.json (regime matrix, inflation, policy, bonds, liquidity, from
 // FRED) independently — either can fail without breaking the other blocks.
 
-import { fetchJSON, setLoading, setError, setStatus, fmtNum, fmtTimestamp, qs } from './common.js';
+import { fetchData, setLoading, setError, setStatus, fmtNum, fmtTimestamp, qs, SEP } from './common.js';
 import { PALETTE, applyTheme, centerTextPlugin } from './chart-theme.js';
 import { bandLabel, bandColor, componentRead, QUADRANTS, matrixDotPosition, THRESHOLDS } from './macro.js';
 
@@ -27,6 +27,23 @@ function shortDate(d) {
   return `${m}/${y.slice(2)}`;
 }
 
+// Fills the page-hero intro with the live readings behind the dashboard,
+// so the top of the page states today's conditions rather than only
+// describing what the charts below are.
+function buildConditionsSummary(sentiment, fred) {
+  const parts = [];
+  if (sentiment && Number.isFinite(sentiment.composite)) {
+    parts.push(`sentiment reads ${sentiment.composite} (${sentiment.label || bandLabel(sentiment.composite)})`);
+  }
+  const m = fred && fred.matrix;
+  if (m && m.quadrant && m.fedFunds) {
+    parts.push(`the Fed sits in quadrant ${m.quadrant} (${QUADRANTS[m.quadrant].label}) with Fed Funds at ${fmtNum(m.fedFunds.value, 2)}% and the balance sheet ${m.bsTrend}`);
+  }
+  const cpi = fred && fred.latest && fred.latest.cpiYoy;
+  if (cpi) parts.push(`CPI running ${fmtNum(cpi.value, 1)}% YoY`);
+  return parts.length ? ` Right now: ${parts.join('; ')}.` : '';
+}
+
 function statCard(label, value, cls, sub) {
   return `<div class="tool-stat"><span class="tool-stat-label">${label}</span>` +
     `<span class="tool-stat-value${cls ? ' ' + cls : ''}">${value}</span>` +
@@ -36,7 +53,7 @@ function statCard(label, value, cls, sub) {
 // ── Sentiment (CBOE) ─────────────────────────────────────────────────────────
 async function loadSentiment() {
   try {
-    const data = await fetchJSON('/assets/data/macro.json', { timeoutMs: 12000 });
+    const data = await fetchData('/assets/data/macro.json', { timeoutMs: 12000 });
     renderMeters(data.components || []);
     await drawGauge(data.composite, data.label);
     return data;
@@ -64,7 +81,7 @@ function renderMeters(components) {
     return `<div class="tool-meter">` +
       `<div class="tool-meter-head">` +
       `<span class="tool-meter-label">${c.label}</span>` +
-      `<span class="tool-meter-value" style="color:${color}">${c.reading} <span class="tool-meter-sub">score ${Number.isFinite(c.score) ? c.score : '—'} · ${c.read || componentRead(c.score)}</span></span>` +
+      `<span class="tool-meter-value" style="color:${color}">${c.reading} <span class="tool-meter-sub">score ${Number.isFinite(c.score) ? c.score : '—'}${SEP}${c.read || componentRead(c.score)}</span></span>` +
       `</div>` +
       `<div class="tool-meter-track"><div class="tool-meter-fill" style="width:${pct}%;background:${color}"></div></div>` +
       (t ? `<div class="tool-meter-scale"><span>${t.greed} (calm)</span><span>${t.fear} (fear)</span></div>` : '') +
@@ -137,7 +154,7 @@ function renderMatrix(fred) {
     const q = QUADRANTS[letter];
     const active = letter === quadrant;
     return `<div class="tool-matrix-cell${active ? ' active' : ''}" data-letter="${letter}">` +
-      `<span class="tool-matrix-letter">${letter}${active ? ' · CURRENT' : ''}</span>` +
+      `<span class="tool-matrix-letter">${letter}${active ? `${SEP}Current` : ''}</span>` +
       `<span class="tool-matrix-label">${q.label}</span>` +
       `<span class="tool-matrix-strategy">${q.strategy}</span>` +
       `</div>`;
@@ -243,7 +260,7 @@ async function drawYieldCurve(fred) {
 async function loadFred() {
   let fred;
   try {
-    fred = await fetchJSON('/assets/data/macro-fred.json', { timeoutMs: 15000 });
+    fred = await fetchData('/assets/data/macro-fred.json', { timeoutMs: 15000 });
   } catch {
     for (const id of ['matrix-stats', 'matrix-grid', 'inflation-stats', 'bonds-stats']) {
       const el = document.getElementById(id);
@@ -309,15 +326,25 @@ async function load() {
 
   setStatus(els.status, 'idle');
   els.results.classList.remove('tool-hidden');
+  els.heroDetail.textContent = buildConditionsSummary(sentiment, fred);
 
-  els.updated.textContent = fred
-    ? `CBOE delayed + FRED · generated ${fmtTimestamp(fred.generated)}`
-    : 'CBOE delayed';
+  // Stamp the page with its *stalest* source, not just FRED's. The gauge comes
+  // from macro.json on the intraday cadence while the FRED blocks refresh twice
+  // a day, so showing only fred.generated let the page claim to be fresher than
+  // half of what it displays (and vice versa).
+  const stamps = [sentiment && sentiment.generated, fred && fred.generated]
+    .filter(Boolean)
+    .sort();
+  const sources = [sentiment && 'CBOE delayed', fred && 'FRED'].filter(Boolean).join(' + ');
+  els.updated.innerHTML = stamps.length
+    ? `${sources}${SEP}generated ${fmtTimestamp(stamps[0])}`
+    : sources;
 }
 
 function init() {
   els.status = qs('#status');
   els.results = qs('#results');
+  els.heroDetail = qs('#hero-detail');
   els.meters = qs('#meters');
   els.gauge = qs('#gauge-chart');
   els.matrixStats = qs('#matrix-stats');

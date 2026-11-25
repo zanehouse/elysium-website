@@ -21,7 +21,7 @@ function buildItems() {
     title: fm.title,
     subtitle: fm.subtitle || '',
     summary: fm.summary || '',
-    ticker: [fm.ticker, fm.exchange].filter(Boolean).join(' — '),
+    ticker: [fm.ticker, fm.exchange].filter(Boolean).join(report.SEP),
     tickerSort: fm.ticker || '',
     rating: fm.rating || '',
     fm,
@@ -60,29 +60,12 @@ function buildArchivePage(items) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Research Archive &ndash; Elysium</title>
 ${report.metaTags({ title: 'Elysium Research Archive', description: 'Independent equity research and macro frameworks. Company coverage, sector screening, and market structure, kept clear and data-backed.', urlPath: '/research/' })}
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
 </head>
 <body>
 
-  <header>
-    <div class="nav-inner">
-      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium Capital"></a>
-      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-      <nav>
-        <a href="/home/">Home</a>
-        <a href="/research/" class="active">Research</a>
-        <a href="/framework/">Framework</a>
-        <a href="/tools/">Tools</a>
-        <a href="/links/">Links</a>
-      </nav>
-    </div>
-  </header>
+${report.siteHeader('/research/')}
 
   <main>
     <noscript>
@@ -91,7 +74,7 @@ ${report.metaTags({ title: 'Elysium Research Archive', description: 'Independent
 
     <div class="page-hero reveal">
       <h1>Research Archive</h1>
-      <p>Independent equity research — company coverage, sector screening, and process notes.</p>
+      <p>Independent equity research: company coverage, sector screening, and process notes.</p>
     </div>
 
     <div class="sort-bar reveal">
@@ -131,30 +114,13 @@ function buildArticlePage(item) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${fm.title} &ndash; Elysium Research</title>
-${report.metaTags({ title: `${fm.title}${fm.ticker ? ' (' + fm.ticker + ')' : ''} · Elysium Research`, description: fm.summary || fm.subtitle || 'Independent equity research from Elysium.', urlPath: `/research/${slug}.html`, type: 'article' })}
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+${report.metaTags({ title: `${fm.title}${fm.ticker ? ' (' + fm.ticker + ')' : ''} – Elysium Research`, description: fm.summary || fm.subtitle || 'Independent equity research from Elysium.', urlPath: `/research/${slug}.html`, type: 'article' })}
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
 </head>
 <body>
 
-  <header>
-    <div class="nav-inner">
-      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium Capital"></a>
-      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-      <nav>
-        <a href="/home/">Home</a>
-        <a href="/research/" class="active">Research</a>
-        <a href="/framework/">Framework</a>
-        <a href="/tools/">Tools</a>
-        <a href="/links/">Links</a>
-      </nav>
-    </div>
-  </header>
+${report.siteHeader('/research/')}
 
   <main>
     <noscript>
@@ -178,7 +144,7 @@ ${report.metaTags({ title: `${fm.title}${fm.ticker ? ' (' + fm.ticker + ')' : ''
         </div>
       </div>
       ${report.metaStripBlock(fm)}
-      <div class="header-published">Published by Elysium &nbsp;·&nbsp; ${report.fmtDateLong(fm.date)}</div>
+      <div class="header-published">Published by Elysium${report.SEP}${report.fmtDateLong(fm.date)}</div>
     </div>
 
     ${report.keyFactsHTML(fm.keyfacts)}
@@ -206,8 +172,8 @@ const HOME_FEED_COUNT = 3;
 function homeCard(item) {
   return `
         <article class="card">
-          <p class="card-date">${report.fmtDate(item.date)}</p>
           <h2 class="card-title">${item.title}</h2>
+          <p class="card-date">${report.fmtDate(item.date)}</p>
           <p class="card-summary">
             ${item.summary}
           </p>

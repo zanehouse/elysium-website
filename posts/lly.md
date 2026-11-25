@@ -13,7 +13,7 @@ summary: "Eli Lilly is the clear leader in the high-growth GLP-1/GIP cardiometab
 disclaimer: "This document is for informational and educational purposes only and does not constitute financial, investment, tax, or legal advice. Readers should conduct their own research and consult a qualified financial advisor before making investment decisions. Not for distribution."
 keyfacts:
   - label: "Ticker"
-    value: "LLY — NYSE"
+    value: "LLY · NYSE"
   - label: "Rating"
     value: "BULLISH"
   - label: "Price"
@@ -58,7 +58,7 @@ Eli Lilly is the clear leader in the GLP-1 market for diabetes and obesity, with
 
 | Company | Diabetes Drug(s) | Obesity Drug(s) | Notes |
 |---|---|---|---|
-| Eli Lilly | Mounjaro (tirzepatide) | Zepbound (tirzepatide), Foundayo (orforglipron — oral GLP-1, FDA-approved April 1, 2026) | Superior weight-loss efficacy (~20%+ in trials); first approved oral GLP-1 pill with no food/water restrictions; retatrutide (triple agonist) Phase 3 data (March 2026) showed up to 2.0% A1C reduction and 16.8% weight loss in type 2 diabetes patients. |
+| Eli Lilly | Mounjaro (tirzepatide) | Zepbound (tirzepatide), Foundayo (orforglipron, the oral GLP-1 approved April 1, 2026) | Superior weight-loss efficacy (~20%+ in trials); first approved oral GLP-1 pill with no food/water restrictions; retatrutide (triple agonist) Phase 3 data (March 2026) showed up to 2.0% A1C reduction and 16.8% weight loss in type 2 diabetes patients. |
 | Novo Nordisk | Ozempic (semaglutide), Rybelsus (oral) | Wegovy (semaglutide, higher dose) | Market leader in volume but trailing on efficacy; oral semaglutide already available but with dosing restrictions. |
 | Amgen | — | MariTide (GLP-1/GIP fusion, Phase 2/3) | Monthly injection; early data ~20% weight loss. |
 | Pfizer | — | (Discontinued danuglipron oral) | Pipeline setbacks due to side effects; no current GLP-1 offering. |
@@ -109,9 +109,9 @@ Technically, the outlook is **mildly bullish** with supportive momentum followin
 
 | Level | Price | Notes |
 |---|---|---|
-| Call Wall | $1,000 | +5.12% — break above on volume could trigger acceleration |
+| Call Wall | $1,000 | +5.12%; break above on volume could trigger acceleration |
 | Zero Gamma / Flip | $933.66 | −1.85% |
-| Put Wall | $910 | −4.34% — downside risk increases sharply below |
+| Put Wall | $910 | −4.34%; downside risk increases sharply below |
 | 1W −1σ | ~$900 | Rejected; inline with past put wall |
 
 Price is above both the 20 and 200 EMAs on the daily timeframe. Analyst consensus is overwhelmingly positive ("Strong Buy"), with supportive moving averages on weekly timeframes. A break above $1,000 on volume could trigger further acceleration; downside risk increases sharply below the put wall.

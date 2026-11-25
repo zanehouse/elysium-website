@@ -151,7 +151,19 @@ export function parseOccSymbol(occ) {
   return { root, expiry, type, strike };
 }
 
-// Normalize a raw CBOE payload to { spot, asof, contracts:[{expiry,type,strike,oi,gamma,volume}] }.
+// Normalize a raw CBOE payload to
+//   { spot, asof, contracts:[{expiry,type,strike,oi,gamma,volume,iv?}] }.
+//
+// `iv` is CBOE's implied volatility as a DECIMAL FRACTION (0.3230 = 32.30%),
+// and it is OPTIONAL: the key is omitted rather than set to 0 when there is no
+// usable quote. CBOE overloads iv=0 to mean "no quote" — it shows up on deep
+// ITM contracts that also report delta ±1 and gamma 0 (~14% of a typical
+// chain), so a literal 0 would be a fake reading, not a low one.
+//
+// Everything past that — the OTM-only rule, the DTE floor, the sane-range
+// bounds — is volatility-model judgment and lives in js/tools/vol.js, where
+// it is documented and unit-tested. This function stays a transport
+// normalizer.
 export function parseChain(json) {
   const data = (json && json.data) || {};
   const spot = Number(data.current_price ?? data.close ?? data.prev_day_close ?? 0) || 0;
@@ -163,7 +175,13 @@ export function parseChain(json) {
     if (!parsed) continue;
     const gamma = Number(o.gamma);
     const oi = Number(o.open_interest);
+    // NOTE: this guard is deliberately unchanged. Letting IV-bearing rows
+    // through when gamma is missing would admit new contracts into
+    // selectContracts -> computeGex and silently move every committed GEX
+    // number. In practice it never fires anyway (0 rows dropped across
+    // full AAPL and SPX chains), so relaxing it would buy nothing.
     if (!Number.isFinite(gamma) || !Number.isFinite(oi)) continue;
+    const iv = Number(o.iv);
     contracts.push({
       expiry: parsed.expiry,
       type: parsed.type,
@@ -171,6 +189,7 @@ export function parseChain(json) {
       oi,
       gamma,
       volume: Number(o.volume) || 0,
+      ...(Number.isFinite(iv) && iv > 0 ? { iv } : {}),
     });
   }
   return { spot, asof, contracts };

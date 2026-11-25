@@ -12,7 +12,7 @@ summary: "Novo Nordisk remains the market leader in GLP-1 therapies but faces in
 disclaimer: "This document is for informational and educational purposes only and does not constitute financial, investment, tax, or legal advice. Readers should conduct their own research and consult a qualified financial advisor before making investment decisions. Not for distribution."
 keyfacts:
   - label: "Ticker"
-    value: "NVO — NYSE"
+    value: "NVO · NYSE"
   - label: "Rating"
     value: "BEARISH"
   - label: "Price"

@@ -7,22 +7,19 @@
   <title>Gamma Exposure (GEX) &ndash; Elysium Tools</title>
   <!-- EMBED:START -->
   <meta name="description" content="Net dealer gamma exposure by strike with automatic contract selection: zero-gamma flip, call wall, and put wall. Free, CBOE-delayed data." />
-  <meta property="og:site_name" content="Elysium Capital" />
+  <meta property="og:site_name" content="Elysium" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Gamma Exposure (GEX) · Elysium Tools" />
+  <meta property="og:title" content="Gamma Exposure (GEX) – Elysium Tools" />
   <meta property="og:description" content="Net dealer gamma exposure by strike with automatic contract selection: zero-gamma flip, call wall, and put wall. Free, CBOE-delayed data." />
   <meta property="og:url" content="https://elysiumlab.markets/tools/gex/" />
   <meta property="og:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Gamma Exposure (GEX) · Elysium Tools" />
+  <meta name="twitter:title" content="Gamma Exposure (GEX) – Elysium Tools" />
   <meta name="twitter:description" content="Net dealer gamma exposure by strike with automatic contract selection." />
   <meta name="twitter:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
   <meta name="theme-color" content="#D4D4D4" />
   <!-- EMBED:END -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
 </head>
@@ -31,7 +28,7 @@
 
   <header>
     <div class="nav-inner">
-      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium Capital"></a>
+      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium"></a>
       <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -61,7 +58,7 @@
 
     <div class="page-hero reveal">
       <h1>Gamma Exposure</h1>
-      <p>Net dealer gamma by strike. The engine auto-selects the expiries and strikes that matter, then locates the zero-gamma flip and the gamma walls. Search any optionable ticker; prefetched symbols load instantly, and anything else gets looked up live.</p>
+      <p>Net dealer gamma by strike. Contract selection runs on its own, pulling the expirations and strikes that carry real open interest, then locating the zero-gamma flip and the gamma walls. Any optionable ticker is searchable; prefetched symbols load instantly, and anything else is looked up live.</p>
     </div>
 
     <div class="tool-controls reveal">
@@ -100,22 +97,25 @@
     </section>
 
     <p class="tool-note">
-      <b>Convention:</b> dollar gamma per 1% move — per contract <code>Γ × weight × 100 × Spot² × 0.01</code>,
-      with calls contributing positive gamma and puts negative (naive dealer-positioning assumption). Weight is
-      open interest by default (settled overnight, the standard) or today's traded volume if you switch the
-      <b>Weight by</b> toggle — volume-weighting reflects today's flow rather than resting positioning.
-      Bars show net gamma by strike (green positive, red negative); the line is the cumulative profile, and the
-      <b>zero-gamma flip</b> is where it crosses zero nearest spot. The <b>call wall</b> / <b>put wall</b> are the
-      strikes of largest positive / negative net gamma. The <b>Expiration</b> dropdown auto-selects the contracts
-      that matter (0DTE plus every expiry within 30 days plus the next monthly OPEX) by default — pick "All",
-      a date range, or any individual expiration out to LEAPS. Strikes are always limited to ±12% of spot, above
-      a per-symbol open-interest floor, and must have traded at least one contract today — this drops strikes
-      carrying stale, untouched-today open interest that would otherwise stretch the chart's strike axis out with
-      little to show for it. The <b>Snapshot</b> toggle switches between the latest intraday chain and
-      a frozen end-of-day close snapshot (prefetched symbols only). Prefetched symbols (~60 liquid indices, ETFs,
-      and megacaps) load instantly and refresh every 15 minutes; any other ticker is looked up live by racing
-      several public CORS proxies at once, since CBOE's chain endpoint isn't directly reachable from a browser —
-      this is best-effort and can occasionally be slow or unavailable if every proxy is down at once.
+      <b>Convention:</b> dollar gamma per 1% move, computed per contract as
+      <code>Γ × weight × 100 × Spot² × 0.01</code>, with calls contributing positive gamma and puts negative
+      (the naive dealer-positioning assumption). Weight defaults to open interest, which settles overnight and is
+      the standard, though the <b>Weight by</b> toggle switches it to today's traded volume; volume-weighting
+      reflects the day's flow rather than resting positioning.
+      Bars show net gamma by strike, green for positive and red for negative. The line is the cumulative profile,
+      and the <b>zero-gamma flip</b> is where that line crosses zero nearest spot. The <b>call wall</b> and
+      <b>put wall</b> are the strikes carrying the largest positive and largest negative net gamma.
+      The <b>Expiration</b> dropdown defaults to the contracts that carry the most weight: 0DTE, every expiration
+      within 30 days, and the next monthly OPEX. "All", a date range, or any single expiration out to LEAPS are
+      all selectable. Strikes are always held within &plusmn;12% of spot, kept above a per-symbol open-interest
+      floor, and required to have traded at least one contract today. That last filter drops strikes holding
+      stale open interest nothing has touched today, which would otherwise stretch the strike axis out with
+      little to show for it. The <b>Snapshot</b> toggle switches between the latest intraday chain and a frozen
+      end-of-day close snapshot, available for prefetched symbols only.
+      Prefetched symbols cover roughly 60 liquid indices, ETFs, and megacaps; they load instantly and refresh
+      every 15 minutes. Any other ticker is looked up live by racing several public CORS proxies at once, since
+      CBOE's chain endpoint isn't reachable from a browser directly. That path is best-effort and can occasionally
+      run slow or fail outright if every proxy is down at the same time.
       Data: CBOE 15-minute delayed. Not investment advice.
     </p>
 
@@ -125,10 +125,10 @@
     <div class="footer-inner">
       <div class="footer-grid">
         <div class="footer-brand">
-          <img class="footer-logo" src="/assets/logo.png" alt="Elysium Capital" />
-          <p class="footer-tagline">Independent Macro Research</p>
+          <img class="footer-logo" src="/assets/logo.png" alt="Elysium" />
+          <p class="footer-tagline">Independent macro research</p>
           <p class="footer-disclaimer">
-            Content published by Elysium Capital is for informational and educational purposes only and does
+            Content published by Elysium is for informational and educational purposes only and does
             not constitute financial, investment, tax, or legal advice, nor an offer or solicitation to buy
             or sell any security.
           </p>
@@ -144,13 +144,20 @@
         <div class="footer-col">
           <span class="footer-col-heading">Connect</span>
           <a class="footer-link" href="https://x.com/elysiumfirm" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+          <a class="footer-link" href="https://www.instagram.com/elysiumfirm/" target="_blank" rel="noopener noreferrer">Instagram</a>
           <a class="footer-link" href="mailto:research@elysiumlab.markets">Email</a>
           <a class="footer-link" href="https://discord.gg/scale" target="_blank" rel="noopener noreferrer">Discord</a>
         </div>
+        <nav class="footer-col" aria-label="Legal">
+          <span class="footer-col-heading">Legal</span>
+          <a class="footer-link" href="/privacy/">Privacy</a>
+          <a class="footer-link" href="/terms/">Terms</a>
+          <a class="footer-link" href="/disclaimer/">Disclaimer</a>
+        </nav>
       </div>
       <div class="footer-bottom">
-        <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium Capital. All rights reserved.</span>
-        <span class="footer-copy">Not investment advice &nbsp;&middot;&nbsp; Not for distribution</span>
+        <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium. All rights reserved.</span>
+        <span class="footer-copy">Not investment advice<span class="sep"></span>Not for distribution</span>
       </div>
     </div>
   </footer>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Options Greeks Lab &ndash; Elysium Tools</title>
+  <!-- EMBED:START -->
+  <meta name="description" content="A full Black-Scholes calculator with dividend yield: price, all five greeks, an implied-volatility solver, and payoff curves. Every unit convention stated. Free, and runs entirely in the browser." />
+  <meta property="og:site_name" content="Elysium" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Options Greeks Lab – Elysium Tools" />
+  <meta property="og:description" content="A full Black-Scholes calculator with dividend yield: price, all five greeks, an implied-volatility solver, and payoff curves. Every unit convention stated." />
+  <meta property="og:url" content="https://elysiumlab.markets/tools/greeks/" />
+  <meta property="og:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Options Greeks Lab – Elysium Tools" />
+  <meta name="twitter:description" content="Black-Scholes price, greeks, implied-volatility solver and payoff curves. Free, and computed entirely in the browser." />
+  <meta name="twitter:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
+  <meta name="theme-color" content="#D4D4D4" />
+  <!-- EMBED:END -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+
+  <header>
+    <div class="nav-inner">
+      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium"></a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="/home/">Home</a>
+        <a href="/research/">Research</a>
+        <a href="/framework/">Framework</a>
+        <a href="/tools/">Tools</a>
+        <a href="/links/">Links</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <noscript>
+      <style>.reveal{opacity:1!important;transform:none!important;transition:none!important}</style>
+      <p style="padding:3rem 0;color:#f87171">This tool requires JavaScript.</p>
+    </noscript>
+
+    <nav class="breadcrumb reveal" aria-label="Breadcrumb">
+      <a href="/home/">Home</a>
+      <span class="breadcrumb-sep">/</span>
+      <a href="/tools/">Tools</a>
+      <span class="breadcrumb-sep">/</span>
+      <span aria-current="page">Greeks Lab</span>
+    </nav>
+
+    <div class="page-hero reveal">
+      <h1>Options Greeks Lab</h1>
+      <p>Black-Scholes-Merton pricing with continuous dividend yield: the premium, all five greeks, and the payoff and sensitivity curves behind them. Everything computes locally in the browser from manually entered inputs, with no ticker, no feed, and nothing sent anywhere. Changing any field recalculates the whole page.</p>
+    </div>
+
+    <div class="tool-input-grid reveal">
+      <div class="tool-field">
+        <span class="tool-controls-label">Type</span>
+        <span id="type-toggle" class="tool-toggle-group"></span>
+      </div>
+      <div class="tool-field">
+        <label class="tool-controls-label" for="in-spot">Spot</label>
+        <input id="in-spot" class="tool-input tool-input-num" type="number" step="any" min="0" value="100" />
+        <span class="tool-field-hint">underlying price</span>
+      </div>
+      <div class="tool-field">
+        <label class="tool-controls-label" for="in-strike">Strike</label>
+        <input id="in-strike" class="tool-input tool-input-num" type="number" step="any" min="0" value="100" />
+        <span class="tool-field-hint">contract strike</span>
+      </div>
+      <div class="tool-field">
+        <label class="tool-controls-label" for="in-dte">Days</label>
+        <input id="in-dte" class="tool-input tool-input-num" type="number" step="any" min="0" value="30" />
+        <span class="tool-field-hint">calendar days, ACT/365</span>
+      </div>
+      <div class="tool-field">
+        <label class="tool-controls-label" for="in-iv">Implied Vol</label>
+        <input id="in-iv" class="tool-input tool-input-num" type="number" step="any" min="0" value="25" />
+        <span class="tool-field-hint">annualised, percent</span>
+      </div>
+      <div class="tool-field">
+        <label class="tool-controls-label" for="in-rate">Rate</label>
+        <input id="in-rate" class="tool-input tool-input-num" type="number" step="any" value="4" />
+        <span class="tool-field-hint" id="rate-hint">risk-free, percent</span>
+      </div>
+      <div class="tool-field">
+        <label class="tool-controls-label" for="in-div">Dividend</label>
+        <input id="in-div" class="tool-input tool-input-num" type="number" step="any" value="0" />
+        <span class="tool-field-hint">continuous yield, percent</span>
+      </div>
+    </div>
+
+    <div class="tool-filter-bar">
+      <span class="tool-filter-label">Days preset</span>
+      <span id="dte-chips" class="tool-chips"></span>
+    </div>
+
+    <div id="status" class="tool-status" hidden></div>
+
+    <section id="results">
+      <div class="tool-stats" id="stats"></div>
+
+      <p class="tool-subhead">Solve for implied volatility</p>
+      <div class="tool-controls">
+        <span class="tool-controls-label">Market price</span>
+        <input id="in-market" class="tool-input tool-input-num" type="number" step="any" min="0"
+          placeholder="e.g. 4.75" aria-label="Market price" />
+        <button id="solve-btn" class="tool-btn">Solve</button>
+        <span class="tool-filter-count" id="solve-result"></span>
+      </div>
+
+      <div class="tool-filter-bar">
+        <span class="tool-filter-label">Curve</span>
+        <span id="greek-toggle" class="tool-toggle-group"></span>
+      </div>
+
+      <div class="tool-chart-row">
+        <div>
+          <span class="tool-chart-title">Value vs. Payoff at Expiry</span>
+          <div class="tool-chart-wrap short">
+            <canvas id="payoff-chart"></canvas>
+          </div>
+        </div>
+        <div>
+          <span class="tool-chart-title" id="greek-chart-title">Delta vs. Spot</span>
+          <div class="tool-chart-wrap short">
+            <canvas id="greek-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <p class="tool-note">
+      <b>Units.</b> This is where options calculators most often mislead, because the same greek gets quoted
+      several different ways. Time is in years on an ACT/365 basis. <b>Delta</b> is per $1 of underlying.
+      <b>Gamma</b> is the change in delta per $1. <b>Vega</b> is shown <i>per one volatility point</i>, meaning a
+      move from 25% to 26%, which is the trading convention; the raw mathematical derivative is 100&times; larger.
+      <b>Theta</b> is shown <i>per calendar day</i>, not per trading day and not per year, and runs negative for a
+      long option. <b>Rho</b> is shown <i>per 1%, or 100bp,</i> of rate. Rate and dividend yield are entered as
+      percentages and treated as continuously compounded.
+      <br><br>
+      <b>The model.</b> Black-Scholes-Merton with a continuous dividend yield, the standard European pricing
+      model. It assumes constant volatility and lognormal returns, so it will not reproduce the volatility smile
+      visible in real option quotes; that smile is the market disagreeing with this
+      exact assumption. It also prices <i>European</i> exercise, so American options on dividend-paying
+      underlyings can be worth more, and the gap is widest for in-the-money puts. The model is best used to
+      understand sensitivities and relative behavior rather than as a source of fair value.
+      <br><br>
+      <b>The implied-volatility solver</b> inverts the price with a bracketed Newton method, so it converges for
+      any quote inside the no-arbitrage bounds. When no solution exists, it reports that instead of returning a
+      plausible-looking number: below intrinsic value, above the discounted underlying, or where the contract
+      carries essentially no time value. That last case is real and worth understanding, because a deep
+      in-the-money contract can be expensive and still encode nothing about volatility when all of its price is
+      intrinsic. Volatility is carried entirely by <i>time value</i>.
+      <br><br>
+      <b>Where the default rate comes from:</b> the 3-month Treasury yield on FRED, refreshed daily by the same
+      job that feeds the <a href="/tools/macro/">Macro Dashboard</a>. It can be overwritten freely. Page state
+      lives in the URL, so any scenario built here can be linked or bookmarked as-is.
+      For dealer positioning on real option chains, see
+      <a href="/tools/gex/">Gamma Exposure</a>. Not investment advice.
+    </p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img class="footer-logo" src="/assets/logo.png" alt="Elysium" />
+          <p class="footer-tagline">Independent macro research</p>
+          <p class="footer-disclaimer">
+            Content published by Elysium is for informational and educational purposes only and does
+            not constitute financial, investment, tax, or legal advice, nor an offer or solicitation to buy
+            or sell any security.
+          </p>
+        </div>
+        <nav class="footer-col" aria-label="Footer">
+          <span class="footer-col-heading">Site</span>
+          <a class="footer-link" href="/home/">Home</a>
+          <a class="footer-link" href="/research/">Research</a>
+          <a class="footer-link" href="/framework/">Framework</a>
+          <a class="footer-link" href="/tools/">Tools</a>
+          <a class="footer-link" href="/links/">Links</a>
+        </nav>
+        <div class="footer-col">
+          <span class="footer-col-heading">Connect</span>
+          <a class="footer-link" href="https://x.com/elysiumfirm" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+          <a class="footer-link" href="https://www.instagram.com/elysiumfirm/" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a class="footer-link" href="mailto:research@elysiumlab.markets">Email</a>
+          <a class="footer-link" href="https://discord.gg/scale" target="_blank" rel="noopener noreferrer">Discord</a>
+        </div>
+        <nav class="footer-col" aria-label="Legal">
+          <span class="footer-col-heading">Legal</span>
+          <a class="footer-link" href="/privacy/">Privacy</a>
+          <a class="footer-link" href="/terms/">Terms</a>
+          <a class="footer-link" href="/disclaimer/">Disclaimer</a>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium. All rights reserved.</span>
+        <span class="footer-copy">Not investment advice<span class="sep"></span>Not for distribution</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js" defer></script>
+  <script src="/js/script.js"></script>
+  <script src="/js/load.js" defer></script>
+  <script type="module" src="/js/tools/greeks-page.js"></script>
+
+</body>
+
+</html>

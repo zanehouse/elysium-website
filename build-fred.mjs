@@ -7,9 +7,10 @@
 // pure functions the browser would use (js/tools/fred.js, macro.js), and
 // writes a small trimmed JSON for the page to load directly.
 
-import { writeFile, mkdir } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { writeIfChanged } from './scripts/write-if-changed.mjs';
 
 import { parseFredCsv, yoySeries, trimSince, thinTo, latest, deltaOverMonths } from './js/tools/fred.js';
 import { matrixQuadrant, rateRegime, bsTrend, MATRIX_RATE_HIGH_THRESHOLD } from './js/tools/macro.js';
@@ -126,7 +127,7 @@ async function main() {
     series,
   };
 
-  await writeFile(path.join(DATA_DIR, 'macro-fred.json'), JSON.stringify(out));
+  await writeIfChanged(path.join(DATA_DIR, 'macro-fred.json'), out);
   console.log(`  MATRIX quadrant=${matrix.quadrant} (rate=${matrix.rateRegime}, bs=${matrix.bsTrend})`);
   console.log('Wrote assets/data/macro-fred.json');
 }

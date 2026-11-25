@@ -10,17 +10,18 @@
 //
 // Usage:  node build-congress.mjs [YEAR]
 
-import { writeFile, mkdir } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import zlib from 'node:zlib';
 import path from 'node:path';
+import { writeIfChanged } from './scripts/write-if-changed.mjs';
 
 import { parseDisclosureXml, filterPTR, sortByDateDesc, ptrPdfUrl, memberName } from './js/tools/congress.js';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(ROOT, 'assets', 'data');
 
-const UA = 'Elysium Capital tools (research@elysiumlab.markets)';
+const UA = 'Elysium tools (research@elysiumlab.markets)';
 const MAX_FILINGS = 250;
 const HEAD_CONCURRENCY = 6;
 const HEAD_DELAY_MS = 60;
@@ -113,7 +114,7 @@ async function main() {
   await checkPdfUrls(rows);
 
   const out = { year: Number(year), generated: new Date().toISOString(), source: 'House Clerk (disclosures-clerk.house.gov)', filings: rows };
-  await writeFile(path.join(DATA_DIR, 'congress.json'), JSON.stringify(out));
+  await writeIfChanged(path.join(DATA_DIR, 'congress.json'), out);
   console.log(`  Wrote ${rows.length} congress filings to assets/data/congress.json`);
 }
 

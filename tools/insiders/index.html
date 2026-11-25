@@ -7,21 +7,18 @@
   <title>Insider Trades &ndash; Elysium Tools</title>
   <!-- EMBED:START -->
   <meta name="description" content="Company insider trades from SEC Form 4 filings and Congressional stock trades from House disclosures, filterable, with links to every source filing." />
-  <meta property="og:site_name" content="Elysium Capital" />
+  <meta property="og:site_name" content="Elysium" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Insider Trades · Elysium Tools" />
+  <meta property="og:title" content="Insider Trades – Elysium Tools" />
   <meta property="og:description" content="Company insiders (SEC Form 4) and Congress (House disclosures): filterable trade feeds." />
   <meta property="og:url" content="https://elysiumlab.markets/tools/insiders/" />
   <meta property="og:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Insider Trades · Elysium Tools" />
+  <meta name="twitter:title" content="Insider Trades – Elysium Tools" />
   <meta name="twitter:description" content="Company insiders and Congress trades, filterable, with source links." />
   <meta name="twitter:image" content="https://elysiumlab.markets/assets/elysiumlogo-embed.png" />
   <meta name="theme-color" content="#D4D4D4" />
   <!-- EMBED:END -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
 </head>
@@ -30,7 +27,7 @@
 
   <header>
     <div class="nav-inner">
-      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium Capital"></a>
+      <a class="nav-logo" href="/home/"><img class="nav-logo" src="/assets/logo.png" alt="Elysium"></a>
       <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -60,12 +57,12 @@
 
     <div class="page-hero reveal">
       <h1>Insider Trades</h1>
-      <p>Company insiders from SEC Form 4 filings, and members of Congress from House financial disclosures, filterable, with a link to every source filing.</p>
+      <p>Company insiders from SEC Form 4 filings, and members of Congress from House financial disclosures. Both are filterable, and every row links back to the source filing.</p>
     </div>
 
     <div class="tool-tabs reveal">
       <button class="tool-tab on" data-tab="company">Company Insiders</button>
-      <button class="tool-tab" data-tab="congress">Congress · House</button>
+      <button class="tool-tab" data-tab="congress">Congress (House)</button>
     </div>
 
     <div id="panel-company">
@@ -132,16 +129,18 @@
     </div>
 
     <p class="tool-note">
-      <b>Company Insiders</b> — source: SEC EDGAR, Form 4 filings only (officers, directors, and 10% owners).
-      Covered names carry full transaction detail (insider, type, shares, price), parsed and refreshed periodically;
-      any other ticker loads live from EDGAR as a filing list with links — the SEC does not permit browsers to read
-      the transaction XML directly, so detail for uncovered tickers opens on EDGAR. Transaction codes: <b>P</b> buy,
-      <b>S</b> sell, <b>A</b> grant, <b>F</b> tax withholding, <b>M</b> option exercise, <b>G</b> gift.
-      <b>Congress</b> — source: the official House Clerk financial-disclosure index, Periodic Transaction Reports
-      (stock trades) only. The House publishes no machine-readable transaction detail — the linked PDF report is
-      the source of truth for what was bought or sold. Senate disclosures aren't covered here; see
+      <b>Company Insiders</b> come from SEC EDGAR, Form 4 filings only, meaning officers, directors, and 10%
+      owners. Covered names carry full transaction detail, including the insider, transaction type, share count,
+      and price, parsed and refreshed periodically. Any other ticker loads live from EDGAR as a filing list with
+      links, since the SEC does not permit browsers to read the transaction XML directly, so detail for uncovered
+      tickers opens on EDGAR itself. Transaction codes: <b>P</b> buy, <b>S</b> sell, <b>A</b> grant,
+      <b>F</b> tax withholding, <b>M</b> option exercise, <b>G</b> gift.
+      <b>Congress</b> comes from the official House Clerk financial-disclosure index, covering Periodic
+      Transaction Reports only. The House publishes no machine-readable transaction detail, so the linked PDF
+      report is the source of truth for what was actually bought or sold. Senate disclosures aren't covered here;
+      those live at
       <a href="https://efdsearch.senate.gov/search/" target="_blank" rel="noopener noreferrer">efdsearch.senate.gov</a>.
-      Filings are delayed by SEC/House reporting deadlines. Not investment advice.
+      All filings are delayed by SEC and House reporting deadlines. Not investment advice.
     </p>
 
   </main>
@@ -150,10 +149,10 @@
     <div class="footer-inner">
       <div class="footer-grid">
         <div class="footer-brand">
-          <img class="footer-logo" src="/assets/logo.png" alt="Elysium Capital" />
-          <p class="footer-tagline">Independent Macro Research</p>
+          <img class="footer-logo" src="/assets/logo.png" alt="Elysium" />
+          <p class="footer-tagline">Independent macro research</p>
           <p class="footer-disclaimer">
-            Content published by Elysium Capital is for informational and educational purposes only and does
+            Content published by Elysium is for informational and educational purposes only and does
             not constitute financial, investment, tax, or legal advice, nor an offer or solicitation to buy
             or sell any security.
           </p>
@@ -169,13 +168,20 @@
         <div class="footer-col">
           <span class="footer-col-heading">Connect</span>
           <a class="footer-link" href="https://x.com/elysiumfirm" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+          <a class="footer-link" href="https://www.instagram.com/elysiumfirm/" target="_blank" rel="noopener noreferrer">Instagram</a>
           <a class="footer-link" href="mailto:research@elysiumlab.markets">Email</a>
           <a class="footer-link" href="https://discord.gg/scale" target="_blank" rel="noopener noreferrer">Discord</a>
         </div>
+        <nav class="footer-col" aria-label="Legal">
+          <span class="footer-col-heading">Legal</span>
+          <a class="footer-link" href="/privacy/">Privacy</a>
+          <a class="footer-link" href="/terms/">Terms</a>
+          <a class="footer-link" href="/disclaimer/">Disclaimer</a>
+        </nav>
       </div>
       <div class="footer-bottom">
-        <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium Capital. All rights reserved.</span>
-        <span class="footer-copy">Not investment advice &nbsp;&middot;&nbsp; Not for distribution</span>
+        <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script><noscript>2026</noscript> Elysium. All rights reserved.</span>
+        <span class="footer-copy">Not investment advice<span class="sep"></span>Not for distribution</span>
       </div>
     </div>
   </footer>

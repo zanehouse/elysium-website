@@ -1,12 +1,20 @@
 /* =========================================
-   ELYSIAN CAPITAL — SCRIPT.JS
-   Mobile navigation toggle only.
+   ELYSIUM — SCRIPT.JS
+   Mobile navigation toggle and logo fold.
    ========================================= */
 
 (function () {
   'use strict';
 
   document.addEventListener('DOMContentLoaded', function () {
+    /* Fold the logo down to its Ec mark once the page is scrolled */
+    var logo = document.querySelector('img.nav-logo');
+    if (logo) {
+      var fold = function () { logo.classList.toggle('collapsed', window.scrollY > 24); };
+      window.addEventListener('scroll', fold, { passive: true });
+      fold();
+    }
+
     var toggle = document.querySelector('.nav-toggle');
     var nav    = document.querySelector('nav');
 
